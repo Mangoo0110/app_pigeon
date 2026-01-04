@@ -1,39 +1,16 @@
-<!--
-This README describes the package. If you publish this package to pub.dev,
-this README's contents appear on the landing page for your package.
 
-For information about how to write a good package README, see the guide for
-[writing package pages](https://dart.dev/tools/pub/writing-package-pages).
+**AppPigeon** is a Flutter package that takes care of **authenticated HTTP requests** so you don’t have to manually manage tokens, headers, and refresh logic.
 
-For general information about developing packages, see the Dart guide for
-[creating packages](https://dart.dev/guides/libraries/create-packages)
-and the Flutter guide for
-[developing packages and plugins](https://flutter.dev/to/develop-packages).
--->
+A simple auth-aware networking layer for Flutter apps.
+Built on top of **Dio** and **flutter_secure_storage**.
 
-TODO: Put a short description of the package here that helps potential users
-know whether this package might be useful for them.
+---
 
-## Features
+## ✨ Features
 
-TODO: List what your package can do. Maybe include images, gifs, or videos.
-
-## Getting started
-
-TODO: List prerequisites and provide or point to information on how to
-start using the package.
-
-## Usage
-
-TODO: Include short and useful examples for package users. Add longer examples
-to `/example` folder.
-
-```dart
-const like = 'sample';
-```
-
-## Additional information
-
-TODO: Tell users more about the package: where to find more information, how to
-contribute to the package, how to file issues, what response they can expect
-from the package authors, and more.
+- Automatically attaches auth headers to every request  
+- Securely stores access & refresh tokens  
+- Refreshes tokens when they expire  
+- Keeps authentication state in sync across the app  
+- Handles logout and auth cleanup correctly  
+- Re-authenticates socket connections using the active auth token 

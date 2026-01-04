@@ -17,18 +17,18 @@ base class Auth{
   
   bool get isVerified => _accessToken != null && _refreshToken != null;
   
-  Auth copyWith({
-    String? accessToken,
-    String? refreshToken,
-    DateTime ? accessTokenExpiresAt,
-    DateTime ? refreshTokenExpiresAt
-  }) {
-    return Auth._internal(
-      accessToken: accessToken ?? _accessToken,
-      refreshToken: refreshToken ?? _refreshToken,
-      data: data,
-    );
-  }
+  // Auth copyWith({
+  //   String? accessToken,
+  //   String? refreshToken,
+  //   DateTime ? accessTokenExpiresAt,
+  //   DateTime ? refreshTokenExpiresAt
+  // }) {
+  //   return Auth._internal(
+  //     accessToken: accessToken ?? _accessToken,
+  //     refreshToken: refreshToken ?? _refreshToken,
+  //     data: data,
+  //   );
+  // }
 
   factory Auth.fromMap(Map<String, dynamic> json) {
     return Auth._internal(
@@ -40,7 +40,6 @@ base class Auth{
 
   static Auth? _tryFromJsonString(String source) {
     try {
-      _debugger.dekhao("Trying to decode source: $source");
       return Auth.fromMap(jsonDecode(source));
     } catch (e) {
       return null;

@@ -1,25 +1,39 @@
 part of '../../app_pigeon.dart';
 
-base class AuthStorage {
+class _AuthStatusDecider {
+  static AuthStatus get(Auth? auth) {
+    if(auth == null) {
+      return UnAuthenticated();
+    } 
+    return Authenticated(auth: auth);
+  }
+}
 
-  AuthStorage({FlutterSecureStorage? secureStorage}): _secureStorage = secureStorage ?? FlutterSecureStorage(){
+base class AuthService implements AuthStorageInterface{
+  AuthService(){
     _authStreamController.add(AuthLoading());
     _authManager = _AuthManger( _secureStorage, _authDebugger);
     _currentAuthUidManager = _CurrentAuthUidManger(_secureStorage);
   }
-
-  final Debugger _authDebugger = AuthServiceDebugger();
+  
   late final _AuthManger _authManager;
   late final _CurrentAuthUidManger _currentAuthUidManager;
-  final FlutterSecureStorage _secureStorage;
+  final FlutterSecureStorage _secureStorage = FlutterSecureStorage(
+    aOptions: AndroidOptions(encryptedSharedPreferences: true),
+    iOptions: IOSOptions(
+      accessibility: KeychainAccessibility.first_unlock
+    ));
+  final Debugger _authDebugger = AuthServiceDebugger();
   final StreamController<AuthStatus> _authStreamController = StreamController.broadcast();
 
+  @override
   dispose() {
     _authStreamController.close();
     _secureStorage.unregisterAllListeners();
   }
   
   /// Initializes auth storage listening, updates auth stream on change in secure storage
+  @override
   init() async{
     await getCurrentAuth().then((currentAuth) async{
       final AuthStatus authStatus = _AuthStatusDecider.get(currentAuth);
@@ -43,12 +57,15 @@ base class AuthStorage {
     _secureStorage.registerListener(key: _currentAuthUidManager.currentAuthKey, listener: onCurrentAuthChange);
   }
 
+  @override
   Future<AuthStatus> currentAuthStatus() async{
     return await getCurrentAuth().then((currentAuth) => _AuthStatusDecider.get(currentAuth));
   }
 
+  @override
   Future<List<Auth>> getAllAuth() async => await _authManager.readAllAuth();
 
+  @override
   Future<Auth?> getCurrentAuth() async{
     // First read uid of the current auth
     final uidOfCurrentAuth = await _currentAuthUidManager.read();
@@ -60,6 +77,7 @@ base class AuthStorage {
   }
 
   /// Saves auth as current auth
+  @override
   Future<void> saveNewAuth(SaveNewAuthParams saveAuthParams) async{
     final auth = Auth._internal(
           accessToken: saveAuthParams.accessToken,
@@ -76,6 +94,7 @@ base class AuthStorage {
   }
 
   /// Updates current auth
+  @override
   Future<void> updateCurrentAuth(UpdateAuthParams updateAuthParams) async{
     // Check if current auth exists and given current user key is same as current user key
     // saved in secure storage(source of truth)
@@ -94,6 +113,7 @@ base class AuthStorage {
     await _authManager.write(uId: uidOfCurrentAuth, auth: auth);
   }
 
+  @override
   Future<void> clearCurrentAuthRecord() async {
     _authDebugger.dekhao("Clearing auth record");
     await _authManager.delete(uId: (await _currentAuthUidManager.read()) ?? "");
@@ -102,24 +122,30 @@ base class AuthStorage {
     await _currentAuthUidManager.deleteCurrentAuthRef();
   }
   
+  @override
+  Stream<AuthStatus> get authStream => _authStreamController.stream;
+  
 }
 
-class _CurrentAuthUidManger {
+class _CurrentAuthUidManger implements CurrentAuthUidManagerInterface {
   final FlutterSecureStorage _secureStorage;
   _CurrentAuthUidManger(this._secureStorage);
   final String currentAuthKey = "current_auth";
 
   /// Returns uid of current auth
+  @override
   Future<String?> read() async{
     return await _secureStorage.read(key: currentAuthKey);
   }
 
   /// Saves uid of current auth
+  @override
   Future<void> saveCurrentAuthRef(String uid) async{
     return await _secureStorage.write(key: currentAuthKey, value: uid);
   }
 
   /// Delete current auth uid
+  @override
   Future<void> deleteCurrentAuthRef() async{
     return await _secureStorage.delete(key: currentAuthKey);
   }

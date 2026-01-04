@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
+import 'package:app_pigeon/src/auth/interface/auth_storage_interface.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'src/auth/interface/current_auth_uid_manager_interface.dart';
 import 'src/debug/debug_service.dart';
 import 'src/params/socket_connect_param.dart';
 import 'src/refresh_token_manager.dart';
-part 'src/auth/auth_service.dart';
 part 'src/auth/auth.dart';
 part 'src/auth/auth_status.dart';
 part 'src/auth/auth_storage.dart';
@@ -18,9 +19,9 @@ part 'src/network/api_call_interceptor.dart';
 
 class AppPigeon {
   AppPigeon(
-    this._dio,
-    this._secureStorage,
     this.refreshTokenManager, {
+    int connectTimeout = 15000, // milliseconds
+    int receiveTimeout = 15000, // milliseconds
     required this.baseUrl,
     this.allowOnly = const {
       DebugLabel.apiCall,
@@ -31,19 +32,19 @@ class AppPigeon {
   }) {
     // Set base url
     _dio.options.baseUrl = baseUrl;
+    _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
+    _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
     // Initialize and add interceptor
     _dio.interceptors.add(_apiCallInterceptor);
-    _authService = AuthService(_secureStorage, refreshTokenManager);
-    _apiCallInterceptor = ApiCallInterceptor(_authService._authStorage, _dio, refreshTokenManager);
+    _apiCallInterceptor = ApiCallInterceptor(_authService, _dio, refreshTokenManager);
     _dio.interceptors.add(_apiCallInterceptor);
     _authService.init();
   }
 
-  final Dio _dio;
+  final Dio _dio = Dio();
   final Set<DebugLabel> allowOnly;
   final SocketService _socketService = SocketService();
-  late final AuthService _authService;
-  final FlutterSecureStorage _secureStorage;
+  late final AuthStorageInterface _authService = AuthService();
   final RefreshTokenManagerInterface refreshTokenManager;
   late final ApiCallInterceptor _apiCallInterceptor;
   final String baseUrl;
@@ -57,23 +58,23 @@ class AppPigeon {
   Stream<AuthStatus> get authStream => _authService.authStream;
 
   Future<void> saveNewAuth({required SaveNewAuthParams saveAuthParams}) async {
-    await _authService.saveNewAuth(saveNewAuthParams: saveAuthParams);
+    await _authService.saveNewAuth(saveAuthParams);
   }
 
   Future<void> updateCurrentAuth({
     required UpdateAuthParams updateAuthParams,
   }) async {
-    await _authService.updateCurrentAuth(updateAuthParams: updateAuthParams);
+    await _authService.updateCurrentAuth(updateAuthParams);
   }
 
   /// Returns the current auth record stored.
   Future<Auth?> getCurrentAuthRecord() async {
-    return await _authService._authStorage.getCurrentAuth();
+    return await _authService.getCurrentAuth();
   }
 
   /// Returns all saved separate auth records that are stored locally.
   Future<List<Auth>> getAllAuthRecords() async {
-    return await _authService._authStorage.getAllAuth();
+    return await _authService.getAllAuth();
   }
 
   /// This will remove the current auth reference and data stored locally.
@@ -174,7 +175,7 @@ class AppPigeon {
   Future<void> socketInit(SocketConnetParamX param) async {
     final token =
         param.token ??
-        (await _authService._authStorage.getCurrentAuth())?._accessToken;
+        (await _authService.getCurrentAuth())?._accessToken;
     if (token == null) {
       return;
     }

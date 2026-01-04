@@ -10,7 +10,7 @@ class ApiCallInterceptor extends Interceptor{
 
   final Dio dio;
   final Debugger _apiCallDebugger = ApiCallDebugger();
-  final AuthStorage _authStorage;
+  final AuthStorageInterface _authStorage;
   final RefreshTokenManagerInterface refreshTokenManager;
   bool _refreshingToken = false;
   final Queue<RequestOptions> _requestQueue = Queue<RequestOptions>();
@@ -37,7 +37,7 @@ class ApiCallInterceptor extends Interceptor{
       return handler.reject(err);
     }
     if(_refreshingToken) {
-      _apiCallDebugger.dekhao("Already refreshing token");
+      _apiCallDebugger.dekhao("Already refreshing token..");
       return handler.reject(err);
     }
     
