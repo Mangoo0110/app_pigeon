@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:collection';
 import 'dart:convert';
 import 'package:app_pigeon/src/auth/interface/auth_storage_interface.dart';
 import 'package:dio/dio.dart';
