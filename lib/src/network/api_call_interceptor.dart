@@ -1,4 +1,4 @@
-part of '../../app_pigeon.dart';
+part of '../app_pigeon.dart';
 
 
 
@@ -51,7 +51,14 @@ class ApiCallInterceptor extends Interceptor{
       try {
         _refreshingToken = true;
         refreshTokenResponse = await refreshTokenManager.refreshToken(
-          refreshToken: status.auth._refreshToken ?? ""
+          refreshToken: status.auth._refreshToken ?? "",
+          dio: Dio(
+            BaseOptions(
+              baseUrl: dio.options.baseUrl,
+              connectTimeout: dio.options.connectTimeout,
+              receiveTimeout: dio.options.receiveTimeout,
+            )
+          ),
         );
         _refreshingToken = false;
         await _authStorage.updateCurrentAuth(

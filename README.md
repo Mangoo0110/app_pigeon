@@ -17,6 +17,43 @@ Built on top of **Dio** and **flutter_secure_storage**.
 
 ## 🔁 Basic Usage
 
+### Constructor
+```dart
+import 'package:apppigeon/apppigeon.dart';
+
+// 1️⃣ Implement the RefreshTokenManagerInterface
+class MyRefreshTokenManager implements RefreshTokenManagerInterface {
+  @override
+  Future<String?> refreshToken(String refreshToken) async {
+    // Your logic to call the refresh token API
+    final response = await Dio().post(
+      'https://api.example.com/refresh',
+      data: {'refreshToken': refreshToken},
+    );
+
+    if (response.statusCode == 200) {
+      return response.data['accessToken'] as String;
+    }
+
+    return null; // return null if refresh failed
+  }
+}
+
+// 2️⃣ Create an instance of AppPigeon
+void main() {
+  final refreshTokenManager = MyRefreshTokenManager();
+
+  final appPigeon = AppPigeon(
+    refreshTokenManager,
+    baseUrl: 'https://api.example.com',
+    onError: (error, stack) {
+      print('AppPigeon error: $error');
+      print(stack);
+    },
+  );
+}
+```
+
 ### Login and save auth
 
 ```dart

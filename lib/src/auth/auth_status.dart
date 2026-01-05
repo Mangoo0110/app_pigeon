@@ -1,4 +1,4 @@
-part of '../../app_pigeon.dart';
+part of '../app_pigeon.dart';
 
 sealed class AuthStatus {
   const AuthStatus();

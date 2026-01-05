@@ -19,7 +19,7 @@ abstract interface class RefreshTokenManagerInterface {
   RefreshTokenManagerInterface(this.url);
   /// Makes a http call to the relative api to get refresh token. Returns [RefreshTokenResponse]
   /// This gets called by [AuthService] on expire of access-token.
-  Future<RefreshTokenResponse> refreshToken({required String refreshToken});
+  Future<RefreshTokenResponse> refreshToken({required String refreshToken, required Dio dio});
 
   Future<bool> isExpiredTokenError({required DioException err});
 }

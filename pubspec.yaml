@@ -1,7 +1,8 @@
 name: app_pigeon
-description: "A package that takes care of saving authentication tokens, rest api calls, socket setup."
+description: "A simple auth-aware networking layer for Flutter apps. Built on top of Dio and flutter_secure_storage."
 version: 0.0.1
-homepage:
+homepage: https://github.com/Mangoo0110/app_pigeon
+repository: https://github.com/Mangoo0110/app_pigeon
 
 environment:
   sdk: ^3.0.0
