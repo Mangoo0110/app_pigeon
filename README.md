@@ -1,8 +1,7 @@
-
-**AppPigeon** is a Flutter package that takes care of **authenticated HTTP requests** so you don’t have to manually manage tokens, headers, and refresh logic.
-
 A simple auth-aware networking layer for Flutter apps.
 Built on top of **Dio** and **flutter_secure_storage**.
+
+**AppPigeon** takes care of **authenticated HTTP requests** so you don’t have to manually manage tokens, headers, and refresh logic.
 
 ---
 
