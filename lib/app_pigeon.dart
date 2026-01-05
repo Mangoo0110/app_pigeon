@@ -16,13 +16,37 @@ part 'src/socket/socket_service.dart';
 part 'src/params/auth_params.dart';
 part 'src/network/api_call_interceptor.dart';
 
+mixin class _ErrorHandler {
+  Future<T?> runGuarded<T>(
+    Future<T> Function() action, {
+    void Function(Object error, StackTrace stack)? onError,
+    bool rethrowError = false,
+  }) async {
+    try {
+      return await action();
+    } catch (e, stack) {
+      if (onError != null) {
+        onError(e, stack);
+      }
 
-class AppPigeon {
+      if (rethrowError) {
+        rethrow;
+      }
+
+      return null;
+    }
+  }
+}
+
+
+
+class AppPigeon with _ErrorHandler {
   AppPigeon(
     this.refreshTokenManager, {
     int connectTimeout = 15000, // milliseconds
     int receiveTimeout = 15000, // milliseconds
     required this.baseUrl,
+    this.onError,
     this.allowOnly = const {
       DebugLabel.apiCall,
       DebugLabel.authService,
@@ -30,15 +54,7 @@ class AppPigeon {
       DebugLabel.socketService
     },
   }) {
-    // Set base url
-    _dio.options.baseUrl = baseUrl;
-    _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
-    _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
-    // Initialize and add interceptor
-    _dio.interceptors.add(_apiCallInterceptor);
-    _apiCallInterceptor = ApiCallInterceptor(_authService, _dio, refreshTokenManager);
-    _dio.interceptors.add(_apiCallInterceptor);
-    _authService.init();
+    _init(connectTimeout: connectTimeout, receiveTimeout: receiveTimeout, onError: onError);
   }
 
   final Dio _dio = Dio();
@@ -48,6 +64,29 @@ class AppPigeon {
   final RefreshTokenManagerInterface refreshTokenManager;
   late final ApiCallInterceptor _apiCallInterceptor;
   final String baseUrl;
+  final Function(Object e, StackTrace stacktrace)? onError;
+
+  Future<void> _init({
+    required int connectTimeout,
+    required int receiveTimeout,
+    void Function(Object error, StackTrace stack)? onError,
+  }) async {
+    await runGuarded(
+      () async {
+        // Set base url
+        _dio.options.baseUrl = baseUrl;
+        _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
+        _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
+        // Initialize and add interceptor
+        _dio.interceptors.add(_apiCallInterceptor);
+        _apiCallInterceptor = ApiCallInterceptor(_authService, _dio, refreshTokenManager);
+        _dio.interceptors.add(_apiCallInterceptor);
+        _authService.init();
+      },
+      onError: onError,
+      rethrowError: false,
+    );
+  }
   
 
   dispose() {

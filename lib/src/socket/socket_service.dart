@@ -12,6 +12,19 @@ class SocketConnectParam {
   }) : 
        _token = token,
        _joinId = joinId;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is SocketConnectParam &&
+        other._token == _token &&
+        other._joinId == _joinId &&
+        other.url == url;
+  }
+  
+  @override
+  int get hashCode => Object.hash(_token, _joinId, url);
 }
 
 sealed class NetworkStatus {
@@ -40,18 +53,21 @@ class SocketService {
   /// This api will initialize the socket connection with the given param
   /// 
   /// If a socket connection already exists, it will be disposed and a new connection will be created
-  void init(SocketConnectParam socketConnectParam) {
-    _param = socketConnectParam;
+  void init(SocketConnectParam socketConnectParam,{bool force = false}) {
+    if(_param == socketConnectParam && !force) {
+      return;
+    }
+     _param = socketConnectParam;
     // Dispose previous socket, if exists
     _disposeSocket();
     _init();
   }
 
   Future<void> _init() async {
-    if (_socket != null) {
-      _debugger.dekhao("Socket already initialized. Not initializing again.");
-      return;
-    }
+    // if (_socket != null) {
+    //   _debugger.dekhao("Socket already initialized. Not initializing again.");
+    //   return;
+    // }
     if(_param == null) {
       return;
     }
