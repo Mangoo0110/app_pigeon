@@ -4,7 +4,7 @@
 ///   - making authorized API calls
 ///   - initializing sockets
 
-library AppPigeon;
+library;
 
 export 'src/app_pigeon.dart';
 export 'src/params/socket_connect_param.dart';
