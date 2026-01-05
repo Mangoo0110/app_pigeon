@@ -1,8 +1,3 @@
-## 0.1.0
-- Initial release
-- Auth-aware networking with Dio
-- AppPigeon core features:
-  - Auth-aware HTTP requests with Dio
-  - Refresh token handling
-  - Auth state stream
-  - Socket support
+## 0.1.1
+- Updated README with usage examples
+- Minor fixes and clarifications
