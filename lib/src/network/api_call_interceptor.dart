@@ -13,7 +13,7 @@ class ApiCallInterceptor extends Interceptor{
   final AuthStorageInterface _authStorage;
   final RefreshTokenManagerInterface refreshTokenManager;
   bool _refreshingToken = false;
-  final Queue<RequestOptions> _requestQueue = Queue<RequestOptions>();
+  // final Queue<RequestOptions> _requestQueue = Queue<RequestOptions>();
 
   /// Attaches access token to every request
   @override

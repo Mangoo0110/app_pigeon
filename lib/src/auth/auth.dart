@@ -12,7 +12,7 @@ base class Auth{
   final String? _accessToken;
   final String? _refreshToken;
   final Map<String, dynamic> data;
-  static final Debugger _debugger = AuthServiceDebugger();
+  // static final Debugger _debugger = AuthServiceDebugger();
 
   
   bool get isVerified => _accessToken != null && _refreshToken != null;
