@@ -5,7 +5,7 @@ Built on top of **Dio** and **flutter_secure_storage**.
 
 ---
 
-## ✨ Features
+## Features
 
 - Automatically attaches auth headers to every request  
 - Securely stores access & refresh tokens  
@@ -14,13 +14,13 @@ Built on top of **Dio** and **flutter_secure_storage**.
 - Handles logout and auth cleanup correctly  
 - Re-authenticates socket connections using the active auth token 
 
-## 🔁 Basic Usage
+## Basic Usage
 
 ### Constructor
 ```dart
 import 'package:apppigeon/apppigeon.dart';
 
-// 1️⃣ Implement the RefreshTokenManagerInterface
+// Implement the RefreshTokenManagerInterface
 class MyRefreshTokenManager implements RefreshTokenManagerInterface {
   @override
   Future<RefreshTokenResponse> refreshToken(String refreshToken) async {
@@ -45,7 +45,7 @@ class MyRefreshTokenManager implements RefreshTokenManagerInterface {
   }
 }
 
-// 2️⃣ Create an instance of AppPigeon
+// Create an instance of AppPigeon
 void main() {
   final refreshTokenManager = MyRefreshTokenManager();
 
