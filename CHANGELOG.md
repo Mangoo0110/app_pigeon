@@ -1,3 +1,2 @@
-## 0.1.1
-- Updated README with usage examples
-- Minor fixes and clarifications
+## 0.1.2
+- Updated README with refresh-token-manager-interface implementation example

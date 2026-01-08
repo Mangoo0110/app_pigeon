@@ -23,7 +23,7 @@ import 'package:apppigeon/apppigeon.dart';
 // 1️⃣ Implement the RefreshTokenManagerInterface
 class MyRefreshTokenManager implements RefreshTokenManagerInterface {
   @override
-  Future<String?> refreshToken(String refreshToken) async {
+  Future<RefreshTokenResponse> refreshToken(String refreshToken) async {
     // Your logic to call the refresh token API
     final response = await Dio().post(
       'https://api.example.com/refresh',
@@ -31,7 +31,14 @@ class MyRefreshTokenManager implements RefreshTokenManagerInterface {
     );
 
     if (response.statusCode == 200) {
-      return response.data['accessToken'] as String;
+      return RefreshTokenResponse(
+      accessToken: data["accessToken"], 
+      refreshToken: data["refreshToken"],
+      data: (data["userId"] != null) ? 
+        {
+          "userId": data["userId"],
+        } : null
+    );
     }
 
     return null; // return null if refresh failed

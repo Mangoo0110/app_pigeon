@@ -36,6 +36,7 @@ class ApiCallInterceptor extends Interceptor{
       _apiCallDebugger.dekhao("Timeout error");
       return handler.reject(err);
     }
+    
     if(_refreshingToken) {
       _apiCallDebugger.dekhao("Already refreshing token..");
       return handler.reject(err);

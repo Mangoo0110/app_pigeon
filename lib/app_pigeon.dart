@@ -1,6 +1,6 @@
 /// You can use appPigeon for:
 ///   - saving auth
-///   - listening to authStream
+///   - listening to auth-state changes
 ///   - making authorized API calls
 ///   - initializing sockets
 

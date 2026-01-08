@@ -121,6 +121,8 @@ class AppPigeon with _ErrorHandler {
   }
 
   // Public GET/POST/PUT/DELETE [DIO] wrappers
+
+  /// ### GET
   Future<Response> get(
     String path, {
     dynamic data,
@@ -135,6 +137,7 @@ class AppPigeon with _ErrorHandler {
         onReceiveProgress: onReceiveProgress);
   }
 
+  /// ### POST
   Future<Response> post(String path, {
     dynamic data, 
     Options? options,  
@@ -154,6 +157,7 @@ class AppPigeon with _ErrorHandler {
     );
   }
 
+  /// ### PUT
   Future<Response> put(String path, {
     dynamic data, 
     Options? options,  
@@ -171,6 +175,7 @@ class AppPigeon with _ErrorHandler {
         onReceiveProgress: onReceiveProgress);
   }
 
+  /// ### PATCH
   Future<Response> patch(String path, {
     dynamic data,
     Options? options,
@@ -188,6 +193,7 @@ class AppPigeon with _ErrorHandler {
         onReceiveProgress: onReceiveProgress);
   }
 
+  /// ### DELETE
   Future<Response> delete(
     String path, {
     dynamic data,

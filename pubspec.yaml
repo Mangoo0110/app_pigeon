@@ -1,6 +1,6 @@
 name: app_pigeon
 description: "A simple auth-aware networking layer for Flutter apps. Built on top of Dio and flutter_secure_storage."
-version: 0.1.1
+version: 0.1.2
 homepage: https://github.com/Mangoo0110/app_pigeon
 repository: https://github.com/Mangoo0110/app_pigeon
 
