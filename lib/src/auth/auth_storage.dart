@@ -127,6 +127,7 @@ base class AuthService implements AuthStorageInterface{
   
 }
 
+/// Manages(read, write, delete) uid of current auth
 class _CurrentAuthUidManger implements CurrentAuthUidManagerInterface {
   final FlutterSecureStorage _secureStorage;
   _CurrentAuthUidManger(this._secureStorage);
