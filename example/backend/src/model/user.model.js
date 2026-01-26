@@ -1,7 +1,5 @@
-import { Schema } from "mongoose";
-import bcrypt from "bcrypt"
-import crypto from "crypto"
-import { timeStamp } from "console";
+import mongoose, { Schema } from "mongoose";
+import bcrypt from "bcrypt";
 
 const Roles = ["admin", "staff"]
 const userSchema = new Schema(
@@ -14,12 +12,12 @@ const userSchema = new Schema(
         avatarUrl: {type: String, required: false},
         emailVerified: {type: Boolean, default: false},
     },
-    {timeStamp: true}
+    { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
-  const saltRounds = Number(process.env.bcrypt_salt_round) || 10;
+  const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
   this.password = await bcrypt.hash(this.password, saltRounds);
   next();
 });
@@ -27,18 +25,12 @@ userSchema.pre("save", async function (next) {
 
 // Instance method (user.comparePassword())
 userSchema.methods.comparePassword = async function (plain) {
-  // compare plain to this.password (if you hash it)
-  return plain === this.password;
+  return bcrypt.compare(plain, this.password);
 };
 
 // Static method (User.findByEmail())
 userSchema.statics.findByEmail = async function (email) {
   return this.findOne({ email });
-};
-
-// Static method (User.findByIdAndDelete())
-userSchema.statics.findByIdAndDelete = async function (id) {
-  return this.findByIdAndDelete(id);
 };
 
 const User = mongoose.model("User", userSchema);
