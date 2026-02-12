@@ -3,6 +3,7 @@ import { createServer } from "http";
 import mongoose from "mongoose";
 import { Server as SocketIOServer } from "socket.io";
 import app from "./app.js";
+import router from "./routes/auth_route.js";
 
 const PORT = Number(process.env.PORT || 3000);
 const MONGO_URI = process.env.MONGO_URI || "";
@@ -22,6 +23,7 @@ if (MONGO_URI) {
 }
 
 const httpServer = createServer(app);
+
 const io = new SocketIOServer(httpServer, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
