@@ -13,6 +13,7 @@ import '../../../../core/utils/helpers/handle_future_request.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../model/forget_password_request.dart';
 import '../../repo/auth_repository.dart';
+import 'reset_password_screen.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -51,6 +52,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       processStatusNotifier: processStatusNotifier,
       successSnackbarNotifier: snackbarNotifier,
       errorSnackbarNotifier: snackbarNotifier,
+      onSuccessWithoutData: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => ResetPasswordScreen(
+              email: _form.emailController.text.trim(),
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -58,7 +68,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Widget build(BuildContext context) {
     return AuthScaffold(
       title: 'Forgot password',
-      subtitle: 'We will send a reset link to your email.',
+      subtitle: 'We will send a reset OTP to your email.',
       child: Form(
         key: _form.formKey,
         child: Column(
@@ -76,6 +86,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             const SizedBox(height: 16),
             AuthTextField(
               controller: _form.emailController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
               label: 'Email',
               hintText: 'you@example.com',
               keyboardType: TextInputType.emailAddress,
@@ -86,10 +97,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             RProcessNotifierButton(
               key: const ValueKey('forgot-password-button'),
               processStatusNotifier: processStatusNotifier,
-              generalText: 'Send reset link',
+              generalText: 'Send otp',
               loadingText: 'Sending',
               errorText: 'Try again',
-              doneText: 'Sent',
+              doneText: 'OTP sent',
               onSave: (_) => _submit(),
               onDone: () => processStatusNotifier.setEnabled(message: ''),
             ),

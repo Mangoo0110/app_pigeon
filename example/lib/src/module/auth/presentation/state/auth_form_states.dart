@@ -17,13 +17,13 @@ class LoginFormState {
 
 class SignupFormState {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
-  final TextEditingController fullNameController = TextEditingController();
+  final TextEditingController userNameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final ValueNotifier<bool> isPasswordVisible = ValueNotifier(false);
 
   void dispose() {
-    fullNameController.dispose();
+    userNameController.dispose();
     emailController.dispose();
     passwordController.dispose();
     isPasswordVisible.dispose();
@@ -38,6 +38,23 @@ class ForgotPasswordFormState {
 
   void dispose() {
     emailController.dispose();
+  }
+
+  bool validate() => formKey.currentState?.validate() ?? false;
+}
+
+class ResetPasswordFormState {
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = TextEditingController();
+  final TextEditingController otpController = TextEditingController();
+  final TextEditingController newPasswordController = TextEditingController();
+  final ValueNotifier<bool> isPasswordVisible = ValueNotifier(false);
+
+  void dispose() {
+    emailController.dispose();
+    otpController.dispose();
+    newPasswordController.dispose();
+    isPasswordVisible.dispose();
   }
 
   bool validate() => formKey.currentState?.validate() ?? false;
