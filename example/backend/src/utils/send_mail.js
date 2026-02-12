@@ -1,4 +1,3 @@
-import catchAsync from "./catch_async";
 import nodemailer from 'nodemailer';
 import "dotenv/config";
 
