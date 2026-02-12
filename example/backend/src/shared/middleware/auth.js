@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import AppError from "../error/app_error.js";
+import AppError from "../errors/app_error.js";
 
 export const isAuthenticated = (req, _res, next) => {
   const hdr = req.headers.authorization || "";
@@ -10,7 +10,7 @@ export const isAuthenticated = (req, _res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
-    req.user = decoded; // {id,email,role}
+    req.user = decoded;
     next();
   } catch {
     throw new AppError(401, "Invalid or expired token");

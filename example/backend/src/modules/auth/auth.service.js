@@ -1,12 +1,11 @@
 import crypto from "crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import User from "../model/user.model.js";
-import Auth from "../model/auth.model.js";
-import AppError from "../error/app_error.js";
-import catchAsync from "../utils/catch_async.js";
-import {sendVerificationMail} from "../utils/send_mail.js";
-import {verificationOtpHtml} from "../utils/html.js";
+import User from "../user/user.model.js";
+import Auth from "./auth.model.js";
+import AppError from "../../shared/errors/app_error.js";
+import { sendVerificationMail } from "../../shared/utils/send_mail.js";
+import { verificationOtpHtml } from "../../shared/utils/html.js";
 
 const ACCESS_TTL_MS = Number(process.env.ACCESS_TTL_MS || 15 * 60 * 1000);
 const REFRESH_TTL_MS = Number(
@@ -24,8 +23,18 @@ const signAccessToken = (user) =>
 
 const issueRefreshToken = () => crypto.randomBytes(32).toString("hex");
 
-export const register = catchAsync(async (req, res) => {
-  const { userName, email, password } = req.body;
+const buildAuthPayload = ({ userId, accessToken, refreshToken, isVerified }) => ({
+  userId,
+  user_id: userId,
+  accessToken,
+  access_token: accessToken,
+  refreshToken,
+  refresh_token: refreshToken,
+  isVerified,
+  is_verified: isVerified,
+});
+
+export const registerUser = async ({ userName, email, password }) => {
   if (!email || !userName) {
     throw new AppError(400, "Email and username are required");
   }
@@ -33,7 +42,6 @@ export const register = catchAsync(async (req, res) => {
     throw new AppError(400, "Password is required");
   }
 
-  // Username must be lowercase letters and numbers only.
   if (!String(userName).trim().match(/^[a-z0-9]+$/)) {
     throw new AppError(
       400,
@@ -53,11 +61,10 @@ export const register = catchAsync(async (req, res) => {
   if (user) {
     throw new AppError(400, "User with this username already exists");
   }
-  // generate otp to send
+
   const otp = String(Math.floor(100000 + Math.random() * 900000));
-  const otpExpiry =
-    String(process.env.OTP_EXPIRE || "").trim() || "10 minutes";
-  // try sending email otp
+  const otpExpiry = String(process.env.OTP_EXPIRE || "").trim() || "10 minutes";
+
   try {
     await sendVerificationMail(
       email,
@@ -76,12 +83,9 @@ export const register = catchAsync(async (req, res) => {
   });
   await newUser.save();
   await Auth.create({ userId: newUser._id });
+};
 
-  res.status(201).json({ message: "User registered successfully" });
-});
-
-export const login = catchAsync(async (req, res) => {
-  const { email, userName, password } = req.body;
+export const loginUser = async ({ email, userName, password }) => {
   if (!password || (!email && !userName)) {
     throw new AppError(400, "Email or username and password are required");
   }
@@ -109,25 +113,19 @@ export const login = catchAsync(async (req, res) => {
     { refreshToken, refreshTokenExpiresAt },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
+
   const auth = await Auth.findOne({ userId: user._id });
   const isVerified = auth?.emailVerified ?? user.emailVerified ?? false;
 
-  res.json({
-    data: {
-      userId: user._id.toString(),
-      user_id: user._id.toString(),
-      accessToken,
-      access_token: accessToken,
-      refreshToken,
-      refresh_token: refreshToken,
-      isVerified,
-      is_verified: isVerified,
-    },
+  return buildAuthPayload({
+    userId: user._id.toString(),
+    accessToken,
+    refreshToken,
+    isVerified,
   });
-});
+};
 
-export const refresh = catchAsync(async (req, res) => {
-  const { refreshToken } = req.body;
+export const refreshUserToken = async ({ refreshToken }) => {
   if (!refreshToken) {
     throw new AppError(400, "Refresh token is required");
   }
@@ -151,31 +149,22 @@ export const refresh = catchAsync(async (req, res) => {
   }
 
   const newRefreshToken = issueRefreshToken();
-  const refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TTL_MS);
-
   auth.refreshToken = newRefreshToken;
-  auth.refreshTokenExpiresAt = refreshTokenExpiresAt;
+  auth.refreshTokenExpiresAt = new Date(Date.now() + REFRESH_TTL_MS);
   await auth.save();
 
   const accessToken = signAccessToken(user);
   const isVerified = auth.emailVerified ?? user.emailVerified ?? false;
 
-  res.json({
-    data: {
-      userId: user._id.toString(),
-      user_id: user._id.toString(),
-      accessToken,
-      access_token: accessToken,
-      refreshToken: newRefreshToken,
-      refresh_token: newRefreshToken,
-      isVerified,
-      is_verified: isVerified,
-    },
+  return buildAuthPayload({
+    userId: user._id.toString(),
+    accessToken,
+    refreshToken: newRefreshToken,
+    isVerified,
   });
-});
+};
 
-export const logout = catchAsync(async (req, res) => {
-  const { refreshToken } = req.body;
+export const logoutUser = async ({ refreshToken }) => {
   if (!refreshToken) {
     throw new AppError(400, "Refresh token is required");
   }
@@ -184,6 +173,4 @@ export const logout = catchAsync(async (req, res) => {
     { refreshToken },
     { refreshToken: null, refreshTokenExpiresAt: null }
   );
-
-  res.json({ message: "Logged out successfully" });
-});
+};

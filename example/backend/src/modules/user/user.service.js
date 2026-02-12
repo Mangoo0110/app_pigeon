@@ -1,12 +1,10 @@
-import User from "../model/user.model.js";
-import Auth from "../model/auth.model.js";
-import AppError from "../error/app_error.js";
-import catchAsync from "../utils/catch_async.js";
-import cloudinary from "../utils/cloudinary.js";
 import { unlink } from "fs/promises";
+import User from "./user.model.js";
+import Auth from "../auth/auth.model.js";
+import AppError from "../../shared/errors/app_error.js";
+import cloudinary from "../../shared/utils/cloudinary.js";
 
-export const profile = catchAsync(async (req, res) => {
-  const userId = req.user?.id;
+export const getProfileByUserId = async ({ userId }) => {
   if (!userId) {
     throw new AppError(401, "Not authenticated");
   }
@@ -19,34 +17,29 @@ export const profile = catchAsync(async (req, res) => {
   const auth = await Auth.findOne({ userId: user._id });
   const isVerified = auth?.emailVerified ?? user.emailVerified ?? false;
 
-  res.json({
-    data: {
-      ...user.toObject(),
-      isVerified,
-    },
-  });
-});
+  return {
+    ...user.toObject(),
+    isVerified,
+  };
+};
 
-export const updateProfile = catchAsync(async (req, res) => {
-  const userId = req.user?.id;
+export const updateProfileByUserId = async ({ userId, fullName, filePath }) => {
   if (!userId) {
     throw new AppError(401, "Not authenticated");
   }
 
-  const { fullName } = req.body ?? {};
   const update = {};
-
   if (fullName !== undefined) {
     update.fullName = String(fullName).trim();
   }
 
-  if (req.file?.path) {
-    const uploaded = await cloudinary.uploader.upload(req.file.path, {
+  if (filePath) {
+    const uploaded = await cloudinary.uploader.upload(filePath, {
       folder: "app_pigeon/avatars",
       resource_type: "image",
     });
     update.avatarUrl = uploaded.secure_url;
-    await unlink(req.file.path);
+    await unlink(filePath);
   }
 
   if (Object.keys(update).length === 0) {
@@ -62,5 +55,5 @@ export const updateProfile = catchAsync(async (req, res) => {
     throw new AppError(404, "User not found");
   }
 
-  res.json({ data: user });
-});
+  return user;
+};

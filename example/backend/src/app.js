@@ -1,8 +1,8 @@
 import express from "express";
 import cors from "cors";
-import authRoutes from "./routes/auth_route.js";
-import userRoutes from "./routes/user_route.js";
-import globalErrorHandler from "./middleware/global_error_handler.js";
+import authRoutes from "./modules/auth/auth.route.js";
+import userRoutes from "./modules/user/user.route.js";
+import globalErrorHandler from "./shared/middleware/global_error_handler.js";
 
 const app = express();
 const api = express.Router();
