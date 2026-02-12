@@ -7,7 +7,11 @@ import '../model/chat_message/chat_message.dart';
 abstract class ChatRepository with ErrorHandler {
   AsyncRequest<void> connectToUniversalChat({String joinId = 'global_chat'});
   Stream<ChatMessage> get messageStream;
-  AsyncRequest<void> sendMessage(SendMessageParam message);
+  AsyncRequest<void> sendMessage(
+    SendMessageParam message, {
+    required String senderId,
+    required String senderName,
+  });
 }
 
 class ChatRepositoryStub extends ChatRepository {
@@ -28,7 +32,11 @@ class ChatRepositoryStub extends ChatRepository {
   Stream<ChatMessage> get messageStream => const Stream<ChatMessage>.empty();
 
   @override
-  AsyncRequest<void> sendMessage(SendMessageParam message) {
+  AsyncRequest<void> sendMessage(
+    SendMessageParam message, {
+    required String senderId,
+    required String senderName,
+  }) {
     return Future<ApiResponse<void>>.value(_notImplemented('Send message'));
   }
 }

@@ -1,21 +1,16 @@
-import 'dart:async';
-
 import 'package:app_pigeon/app_pigeon.dart';
-import 'package:example/src/module/chat/model/send_message_param/send_message_param.dart';
 import 'package:flutter/material.dart';
 
 import '../../core/api_handler/api_response.dart';
-import '../../core/constants/api_endpoints.dart';
 import '../../core/di/service_locator.dart';
 import '../../module/auth/model/authenticated_user.dart';
 import '../../module/auth/presentation/screen/login_screen.dart';
 import '../../module/auth/repo/auth_repository.dart';
-import '../../module/chat/model/chat_message/chat_message.dart';
-import '../../module/chat/model/sender/sender.dart';
-import '../../module/chat/presentation/widget/universal_chat_panel.dart';
+import '../../module/chat/presentation/widget/universal_chat_module.dart';
 import '../../module/chat/repo/chat_repository.dart';
 import '../../module/profile/presentation/widget/account_switch_sheet.dart';
 import '../../module/profile/presentation/widget/profile_avatar_action.dart';
+import '../../module/profile/repo/profile_repository.dart';
 
 class AuthenticatedHomeScreen extends StatefulWidget {
   const AuthenticatedHomeScreen({
@@ -31,13 +26,8 @@ class AuthenticatedHomeScreen extends StatefulWidget {
 }
 
 class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
-  final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = <ChatMessage>[];
-
-  StreamSubscription<ChatMessage>? _messageSubscription;
   Map<String, dynamic> _profile = <String, dynamic>{};
-  List<Auth> _accounts = <Auth>[];
-  Auth? _currentAuthRecord;
+  List<Auth> _accounts = const <Auth>[];
   bool _loading = true;
   bool _socketReady = false;
 
@@ -49,8 +39,6 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
 
   @override
   void dispose() {
-    _messageSubscription?.cancel();
-    _messageController.dispose();
     super.dispose();
   }
 
@@ -58,22 +46,22 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
     if (!mounted) return;
     setState(() => _loading = true);
 
-    final appPigeon = serviceLocator<AppPigeon>();
-    final current = await appPigeon.getCurrentAuthRecord();
-    final accounts = await appPigeon.getAllAuthRecords();
+    final authRepo = serviceLocator<AuthRepository>();
+    final profileRepo = serviceLocator<ProfileRepository>();
 
-    Map<String, dynamic> profile = <String, dynamic>{};
-    try {
-      final response = await appPigeon.get(ApiEndpoints.userProfile);
-      final data = response.data["data"];
-      if (data is Map<String, dynamic>) {
-        profile = Map<String, dynamic>.from(data);
-      }
-    } catch (_) {}
+    final accountsRes = await authRepo.fetchAllAccounts();
+    final profileRes = await profileRepo.fetchProfile();
+
+    final accounts = accountsRes is SuccessResponse<List<Auth>>
+        ? (accountsRes.data ?? <Auth>[])
+        : <Auth>[];
+    final profile = profileRes is SuccessResponse<Map<String, dynamic>>
+        ? (profileRes.data ?? <String, dynamic>{})
+        : <String, dynamic>{};
 
     if (!mounted) return;
-    _currentAuthRecord = current;
     _accounts = accounts;
+    debugPrint('Accounts: ${_accounts.length}');
     _profile = profile;
     setState(() => _loading = false);
 
@@ -86,18 +74,11 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
     final connectRes = await chatRepo.connectToUniversalChat();
     if (connectRes is ErrorResponse<void>) return;
 
-    _messageSubscription = chatRepo.messageStream.listen((message) {
-      if (!mounted) return;
-      setState(() => _messages.add(message));
-    });
     _socketReady = true;
   }
 
   Future<void> _saveProfile(String fullName) async {
-    await serviceLocator<AppPigeon>().patch(
-      ApiEndpoints.userProfile,
-      data: <String, dynamic>{"fullName": fullName},
-    );
+    await serviceLocator<ProfileRepository>().updateProfile(fullName: fullName);
     await _loadDashboard();
   }
 
@@ -121,28 +102,6 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
     await serviceLocator<AuthRepository>().logout();
   }
 
-  void _sendChatMessage() {
-    final text = _messageController.text.trim();
-    if (text.isEmpty) return;
-    final sender = _firstNonEmptyString(
-          _profile,
-          ["userName", "fullName", "email", "user_id", "uid"],
-        ) ??
-        widget.currentAuth.userName;
-    final senderId = _firstNonEmptyString(
-          _profile,
-          ["user_id", "userId", "uid", "id"],
-        ) ??
-        widget.currentAuth.uid;
-    final message = ChatMessage(
-      sender: Sender(id: senderId, name: sender),
-      text: text,
-      sentAt: DateTime.now(),
-    );
-    serviceLocator<ChatRepository>().sendMessage(SendMessageParam(text: text));
-    _messageController.clear();
-  }
-
   Future<void> _openProfileSheet() async {
     await showModalBottomSheet<void>(
       context: context,
@@ -152,12 +111,7 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
         return AccountSwitchSheet(
           profile: _profile,
           accounts: _accounts,
-          currentAccountUid: _currentAuthRecord == null
-              ? null
-              : _firstNonEmptyString(
-                  _currentAuthRecord!.data,
-                  ["uid", "user_id", "userId", "id"],
-                ),
+          currentAccountUid: widget.currentAuth.uid,
           onSaveProfile: _saveProfile,
           onSwitchAccount: _switchAccount,
           onAddAccount: _addAccount,
@@ -190,16 +144,27 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
           ),
         ],
       ),
-      body: _loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16),
-              child: UniversalChatPanel(
-                messages: _messages,
-                messageController: _messageController,
-                onSend: _sendChatMessage,
+      body: SafeArea(
+        child: _loading
+            ? const Center(child: CircularProgressIndicator())
+            : Padding(
+                padding: const EdgeInsets.all(16),
+                child: UniversalChatModule(
+                  senderId:
+                      _firstNonEmptyString(
+                        _profile,
+                        ["user_id", "userId", "uid", "id"],
+                      ) ??
+                      widget.currentAuth.uid,
+                  senderName:
+                      _firstNonEmptyString(
+                        _profile,
+                        ["userName", "fullName", "email", "user_id", "uid"],
+                      ) ??
+                      widget.currentAuth.userName,
+                ),
               ),
-            ),
+      ),
     );
   }
 

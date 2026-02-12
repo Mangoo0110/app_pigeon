@@ -4,16 +4,18 @@ import 'package:example/src/module/auth/presentation/screen/login_screen.dart';
 import 'package:example/src/module/auth/presentation/screen/signup_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../main.dart';
+import '../../module/auth/model/authenticated_user.dart';
+import '../view/authenticated_home_screen.dart';
 import 'route_names.dart';
 
 class AppRouter {
   // static Future<void> navigateTo(RouteNames routeName) async {
   //   await navigatorKey.currentState?.pushNamed(routeName.name);
   // }
-  static Future<void> navigateToReplacement(RouteNames routeName) async {
+  static Future<void> navigateToReplacement(RouteNames routeName, [Object? arguments]) async {
     debugPrint('navigateToReplacement: ${routeName.name}, ${navigatorKey.currentState}');
     await navigatorKey.currentState
-        ?.pushReplacementNamed(routeName.path);
+        ?.pushReplacementNamed(routeName.path, arguments: arguments);
   }
 
   // static Future<void> navigateBack() async {
@@ -46,7 +48,9 @@ class AppRouter {
 
     if (settings.name == RouteNames.app.path) {
       return MaterialPageRoute(
-        builder: (context) => const LoginScreen(),
+        builder: (context) => AuthenticatedHomeScreen(
+          currentAuth: settings.arguments as AuthenticatedUser,
+        ),
         settings: settings,
       );
     }
