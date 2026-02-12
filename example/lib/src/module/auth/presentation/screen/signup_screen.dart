@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../state/auth_form_states.dart';
 import '../state/auth_validators.dart';
@@ -15,6 +16,7 @@ import '../../../../core/utils/helpers/handle_future_request.dart';
 import '../../../../core/di/service_locator.dart';
 import '../../model/signup_request.dart';
 import '../../repo/auth_repository.dart';
+import 'email_verification_screen.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -48,7 +50,7 @@ class _SignupScreenState extends State<SignupScreen> {
     await handleFutureRequest(
       futureRequest: () => serviceLocator<AuthRepository>().signup(
         SignupRequest(
-          fullName: _form.fullNameController.text.trim(),
+          userName: _form.userNameController.text.trim(),
           email: _form.emailController.text.trim(),
           password: _form.passwordController.text,
         ),
@@ -57,6 +59,13 @@ class _SignupScreenState extends State<SignupScreen> {
       processStatusNotifier: processStatusNotifier,
       successSnackbarNotifier: snackbarNotifier,
       errorSnackbarNotifier: snackbarNotifier,
+      onSuccessWithoutData: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => const EmailVerificationScreen(),
+          ),
+        );
+      },
     );
   }
 
@@ -81,15 +90,20 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 16),
             AuthTextField(
-              controller: _form.fullNameController,
-              label: 'Full name',
-              hintText: 'Jane Doe',
+              controller: _form.userNameController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
+              label: 'Username',
+              hintText: 'john_doe',
               textInputAction: TextInputAction.next,
-              validator: AuthValidators.fullName,
+              validator: AuthValidators.userName,
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(RegExp(r'[a-z0-9]')),
+              ],
             ),
             const SizedBox(height: 16),
             AuthTextField(
               controller: _form.emailController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
               label: 'Email',
               hintText: 'you@example.com',
               keyboardType: TextInputType.emailAddress,
@@ -99,6 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
             const SizedBox(height: 16),
             AuthPasswordField(
               controller: _form.passwordController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
               isVisible: _form.isPasswordVisible,
               label: 'Password',
               validator: AuthValidators.strongPassword,

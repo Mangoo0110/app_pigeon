@@ -92,14 +92,16 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
             const SizedBox(height: 16),
             AuthTextField(
               controller: _form.userIdController,
-              label: 'User ID',
-              hintText: 'user_123',
+              onChanged: (text) => processStatusNotifier.setEnabled(),
+              label: 'User ID or Email',
+              hintText: 'user_id or you@example.com',
               textInputAction: TextInputAction.next,
               validator: AuthValidators.userId,
             ),
             const SizedBox(height: 16),
             AuthTextField(
               controller: _form.codeController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
               label: 'Verification code',
               hintText: '123456',
               textInputAction: TextInputAction.done,

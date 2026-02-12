@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 16),
             AuthTextField(
               controller: _form.emailController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
               label: 'Email',
               hintText: 'you@example.com',
               keyboardType: TextInputType.emailAddress,
@@ -94,6 +95,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 16),
             AuthPasswordField(
               controller: _form.passwordController,
+              onChanged: (text) => processStatusNotifier.setEnabled(),
               isVisible: _form.isPasswordVisible,
               validator: AuthValidators.password,
               textInputAction: TextInputAction.done,

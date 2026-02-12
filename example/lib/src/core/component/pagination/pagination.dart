@@ -22,8 +22,8 @@ class PaginationController<T> extends ChangeNotifier{
   PaginationController(List<T> items, {required this.onRefresh, required this.onLoadMore, this.snackbarNotifier}): items = ValueNotifier(items);
   
   final ValueNotifier<List<T>> items;
-  final FutureRequest<List<T>> Function({required String searchText}) onRefresh;
-  final FutureRequest<List<T>> Function({required T? lastData, required int limit, required String searchText}) onLoadMore;
+  final AsyncRequest<List<T>> Function({required String searchText}) onRefresh;
+  final AsyncRequest<List<T>> Function({required T? lastData, required int limit, required String searchText}) onLoadMore;
   
   final SnackbarNotifier? snackbarNotifier;
   final ValueNotifier<PaginationLoadState> _state = ValueNotifier(PaginationLoadState.idle);
@@ -39,7 +39,7 @@ class PaginationController<T> extends ChangeNotifier{
   DateTime _lastFetchTime = DateTime.now();
 
   Future<void> handleDataRequest({
-    required FutureRequest<List<T>> Function() futureRequest,
+    required AsyncRequest<List<T>> Function() futureRequest,
     bool refreshing = false,
     SnackbarNotifier? snackbarNotifier,
   }) async{

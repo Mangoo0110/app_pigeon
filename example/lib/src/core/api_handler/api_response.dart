@@ -4,6 +4,11 @@ abstract class ApiResponse<T> {
   final T? data;
 
   ApiResponse({required this.success, required this.message, required this.data});
+
+  @override
+  String toString() {
+    return '''ApiResponse{success: $success, ${"\n"}message: $message, ${"\n"}data: $data${"\n"}}''';
+  }
 }
 
 class SuccessResponse<T> extends ApiResponse<T> {

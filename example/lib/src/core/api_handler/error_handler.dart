@@ -35,6 +35,7 @@ mixin class ErrorHandler {
           stackTrace: s
       );
     } on DioException catch (e, s) {
+      debugPrint(e.response?.toString());
       debugPrint(e.response?.data["message"].toString());
       debugPrint(e.stackTrace.toString());
       switch (e.type) {

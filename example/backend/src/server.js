@@ -22,6 +22,7 @@ if (MONGO_URI) {
 }
 
 const httpServer = createServer(app);
+
 const io = new SocketIOServer(httpServer, {
   cors: { origin: "*", methods: ["GET", "POST"] },
 });
