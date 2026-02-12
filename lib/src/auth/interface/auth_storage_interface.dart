@@ -32,5 +32,5 @@ abstract interface class AuthStorageInterface {
   Future<void> clearCurrentAuthRecord();
 
   /// Switches current auth by uid
-  Future<void> switchCurrentAuth({required String uid});
+  Future<void> switchAccount({required String uid});
 }

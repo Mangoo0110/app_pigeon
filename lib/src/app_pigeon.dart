@@ -126,7 +126,7 @@ class AppPigeon with _ErrorHandler {
 
   /// Switches current auth by uid.
   Future<void> switchAccount({required String uid}) async {
-    await _authStorage.switchCurrentAuth(uid: uid);
+    await _authStorage.switchAccount(uid: uid);
   }
 
   // Public GET/POST/PUT/DELETE [DIO] wrappers

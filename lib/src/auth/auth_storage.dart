@@ -128,8 +128,12 @@ base class AuthStorage implements AuthStorageInterface{
   Stream<AuthStatus> get authStream => _authStreamController.stream;
   
   @override
-  Future<void> switchCurrentAuth({required String uid}) async{
-    _currentAuthUidManager.saveCurrentAuthRef(uid);
+  Future<void> switchAccount({required String uid}) async{
+    final auth = await _authManager.read(uId: uid);
+    if (auth == null) {
+      throw Exception("Auth with uid $uid does not exist.");
+    }
+    await _currentAuthUidManager.saveCurrentAuthRef(uid);
     await getCurrentAuth();
   }
   
