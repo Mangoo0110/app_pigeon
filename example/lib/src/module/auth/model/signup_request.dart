@@ -1,19 +1,19 @@
 class SignupRequest {
   final String email;
   final String password;
-  final String fullName;
+  final String userName;
 
   SignupRequest({
     required this.email,
     required this.password,
-    required this.fullName,
+    required this.userName,
   });
 
   factory SignupRequest.fromJson(Map<String, dynamic> json) {
     return SignupRequest(
       email: json['email'] as String? ?? '',
       password: json['password'] as String? ?? '',
-      fullName: json['full_name'] as String? ?? '',
+      userName: json['userName'] as String? ?? '',
     );
   }
 
@@ -21,19 +21,24 @@ class SignupRequest {
     return {
       'email': email,
       'password': password,
-      'full_name': fullName,
+      'userName': userName,
     };
   }
 
   SignupRequest copyWith({
     String? email,
     String? password,
-    String? fullName,
+    String? userName,
   }) {
     return SignupRequest(
       email: email ?? this.email,
       password: password ?? this.password,
-      fullName: fullName ?? this.fullName,
+      userName: userName ?? this.userName,
     );
+  }
+
+  @override
+  String toString() {
+    return 'SignupRequest(email: $email, password: $password, userName: $userName)';
   }
 }

@@ -42,6 +42,21 @@ class AuthValidators {
     return null;
   }
 
+  static String? userName(String? value) {
+    final text = value?.trim() ?? '';
+    if (text.isEmpty) {
+      return 'Username is required';
+    }
+    if (text.length < 3) {
+      return 'Username must be at least 3 characters';
+    }
+    final regex = RegExp(r'^[a-z0-9]+$');
+    if (!regex.hasMatch(text)) {
+      return 'Use lowercase letters and numbers only';
+    }
+    return null;
+  }
+
   static String? verificationCode(String? value) {
     final text = value?.trim() ?? '';
     if (text.isEmpty) {
@@ -53,7 +68,7 @@ class AuthValidators {
   static String? userId(String? value) {
     final text = value?.trim() ?? '';
     if (text.isEmpty) {
-      return 'User ID is required';
+      return 'User ID or email is required';
     }
     return null;
   }

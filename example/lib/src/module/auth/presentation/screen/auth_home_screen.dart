@@ -1,9 +1,9 @@
-import 'package:app_pigeon/app_pigeon.dart';
+import 'package:example/src/app/view/authenticated_home_screen.dart';
 import 'package:example/src/core/di/service_locator.dart';
+import 'package:example/src/module/auth/repo/auth_repository.dart';
 import 'package:flutter/material.dart';
 
-import 'package:example/src/core/di/service_locator.dart';
-import 'authenticated_home_screen.dart';
+import '../../model/authenticated_user.dart';
 import 'email_verification_screen.dart';
 import 'login_screen.dart';
 
@@ -12,11 +12,11 @@ class AuthHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<AuthStatus>(
-      stream: serviceLocator<AppPigeon>().authStream,
+    return StreamBuilder<AuthenticatedUser?>(
+      stream: serviceLocator<AuthRepository>().authStream,
       builder: (context, snapshot) {
-        final status = snapshot.data ?? UnAuthenticated();
-        final resolved = _resolveStatus(status);
+        final user = snapshot.data;
+        final resolved = _resolveStatus(user);
         return Navigator(
           pages: [
             MaterialPage(
@@ -24,63 +24,34 @@ class AuthHomeScreen extends StatelessWidget {
               child: resolved.screen,
             ),
           ],
-          onPopPage: (route, result) => route.didPop(result),
+          onDidRemovePage: (_) {},
         );
       },
     );
   }
 
-  _ResolvedScreen _resolveStatus(AuthStatus status) {
-    if (status is AuthError) {
-      return _ResolvedScreen(
-        key: 'error',
-        screen: _AuthErrorScreen(message: status.error),
-      );
-    }
-    if (status is Authenticated) {
-      if (!status.auth.isVerified) {
-        return _ResolvedScreen(
-          key: 'verify',
-          screen: EmailVerificationScreen(
-            userId: _extractUserId(status.auth.data),
-            showBack: false,
-          ),
-        );
-      }
-      return _ResolvedScreen(
-        key: 'authenticated',
-        screen: AuthenticatedHomeScreen(auth: status.auth),
-      );
-    }
-    if (status is NotVerified) {
-      return _ResolvedScreen(
-        key: 'verify',
-        screen: EmailVerificationScreen(
-          userId: status.userId,
-          showBack: false,
-        ),
-      );
-    }
-    if (status is UnAuthenticated) {
+  _ResolvedScreen _resolveStatus(AuthenticatedUser? user) {
+    if (user == null) {
       return const _ResolvedScreen(
         key: 'login',
         screen: LoginScreen(),
       );
     }
-    return const _ResolvedScreen(
-      key: 'loading',
-      screen: _AuthLoadingScreen(),
-    );
-  }
 
-  String? _extractUserId(Map<String, dynamic> data) {
-    for (final key in ['uid', 'user_id', 'userId', 'id']) {
-      final value = data[key]?.toString().trim();
-      if (value != null && value.isNotEmpty) {
-        return value;
-      }
+    if (user.isVerified) {
+      return _ResolvedScreen(
+        key: 'authenticated',
+        screen: AuthenticatedHomeScreen(currentAuth: user),
+      );
     }
-    return null;
+
+    return _ResolvedScreen(
+      key: 'verify',
+      screen: EmailVerificationScreen(
+        userId: user.uid,
+        showBack: false,
+      ),
+    );
   }
 }
 
@@ -92,38 +63,4 @@ class _ResolvedScreen {
 
   final String key;
   final Widget screen;
-}
-
-class _AuthLoadingScreen extends StatelessWidget {
-  const _AuthLoadingScreen();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-  }
-}
-
-class _AuthErrorScreen extends StatelessWidget {
-  const _AuthErrorScreen({required this.message});
-
-  final String message;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Something went wrong'),
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Text(message),
-        ),
-      ),
-    );
-  }
 }

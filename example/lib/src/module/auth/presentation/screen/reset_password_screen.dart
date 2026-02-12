@@ -1,37 +1,34 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/component/reactive_notifier/snackbar_notifier.dart';
-import '../../../../core/utils/debug/debug_service.dart';
-import 'package:example/src/core/di/service_locator.dart';
-import 'package:example/src/core/utils/helpers/handle_future_request.dart';
-import 'package:example/src/module/auth/repo/auth_repository.dart';
-import '../../model/login_request.dart';
 import '../state/auth_form_states.dart';
 import '../state/auth_validators.dart';
-import '../widget/auth_link_button.dart';
 import '../widget/auth_message_banner.dart';
 import '../widget/auth_password_field.dart';
 import '../widget/auth_scaffold.dart';
 import '../widget/auth_text_field.dart';
 import '../../../../core/component/reactive_notifier/process_notifier.dart';
+import '../../../../core/component/reactive_notifier/snackbar_notifier.dart';
 import '../../../../core/component/reactive_notifier/widget/process_notifier_button.dart';
-import 'forgot_password_screen.dart';
-import 'signup_screen.dart';
+import '../../../../core/di/service_locator.dart';
+import '../../../../core/utils/debug/debug_service.dart';
+import '../../../../core/utils/helpers/handle_future_request.dart';
+import '../../model/reset_password_request.dart';
+import '../../repo/auth_repository.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({
-    this.showBack = false,
+class ResetPasswordScreen extends StatefulWidget {
+  const ResetPasswordScreen({
+    this.email,
     super.key,
   });
 
-  final bool showBack;
+  final String? email;
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ResetPasswordScreen> createState() => _ResetPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final LoginFormState _form = LoginFormState();
+class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
+  final ResetPasswordFormState _form = ResetPasswordFormState();
   final ProcessStatusNotifier processStatusNotifier =
       ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
   late final SnackbarNotifier snackbarNotifier;
@@ -39,6 +36,9 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     super.initState();
+    if (widget.email != null && widget.email!.trim().isNotEmpty) {
+      _form.emailController.text = widget.email!.trim();
+    }
     snackbarNotifier = SnackbarNotifier(context: context);
   }
 
@@ -49,25 +49,28 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _submit() async {
-    if (!_form.validate()) {
-      return;
-    }
+    if (!_form.validate()) return;
     await handleFutureRequest(
-      futureRequest: () => serviceLocator<AuthRepository>().login(
-        LoginRequest(email: _form.emailController.text, password: _form.passwordController.text),
+      futureRequest: () => serviceLocator<AuthRepository>().resetPassword(
+        ResetPasswordRequest(
+          email: _form.emailController.text.trim(),
+          verificationCode: _form.otpController.text.trim(),
+          newPassword: _form.newPasswordController.text,
+        ),
       ),
       debugger: AuthDebugger(),
       processStatusNotifier: processStatusNotifier,
       successSnackbarNotifier: snackbarNotifier,
+      errorSnackbarNotifier: snackbarNotifier,
+      onSuccessWithoutData: () => Navigator.of(context).pop(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return AuthScaffold(
-      title: 'Welcome back',
-      subtitle: 'Sign in to continue using app_pigeon.',
-      showBack: widget.showBack,
+      title: 'Reset password',
+      subtitle: 'Enter your OTP and set a new password.',
       child: Form(
         key: _form.formKey,
         child: Column(
@@ -85,7 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 16),
             AuthTextField(
               controller: _form.emailController,
-              onChanged: (text) => processStatusNotifier.setEnabled(),
+              onChanged: (_) => processStatusNotifier.setEnabled(),
               label: 'Email',
               hintText: 'you@example.com',
               keyboardType: TextInputType.emailAddress,
@@ -93,49 +96,33 @@ class _LoginScreenState extends State<LoginScreen> {
               validator: AuthValidators.email,
             ),
             const SizedBox(height: 16),
-            AuthPasswordField(
-              controller: _form.passwordController,
-              onChanged: (text) => processStatusNotifier.setEnabled(),
-              isVisible: _form.isPasswordVisible,
-              validator: AuthValidators.password,
-              textInputAction: TextInputAction.done,
+            AuthTextField(
+              controller: _form.otpController,
+              onChanged: (_) => processStatusNotifier.setEnabled(),
+              label: 'OTP code',
+              hintText: '123456',
+              textInputAction: TextInputAction.next,
+              validator: AuthValidators.verificationCode,
             ),
-            const SizedBox(height: 8),
-            Align(
-              alignment: Alignment.centerRight,
-              child: AuthLinkButton(
-                label: 'Forgot password?',
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ForgotPasswordScreen(),
-                    ),
-                  );
-                },
-              ),
+            const SizedBox(height: 16),
+            AuthPasswordField(
+              controller: _form.newPasswordController,
+              onChanged: (_) => processStatusNotifier.setEnabled(),
+              isVisible: _form.isPasswordVisible,
+              label: 'New password',
+              validator: AuthValidators.strongPassword,
+              textInputAction: TextInputAction.done,
             ),
             const SizedBox(height: 16),
             RProcessNotifierButton(
-              key: const ValueKey('login-button'),
+              key: const ValueKey('reset-password-button'),
               processStatusNotifier: processStatusNotifier,
-              generalText: 'Login',
-              loadingText: 'Logging in',
+              generalText: 'Reset password',
+              loadingText: 'Resetting',
               errorText: 'Try again',
               doneText: 'Done',
               onSave: (_) => _submit(),
-              onDone: () =>
-                  processStatusNotifier.setEnabled(message: ''),
-            ),
-            const SizedBox(height: 20),
-            AuthLinkButton(
-              label: 'Create an account',
-              onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SignupScreen(),
-                  ),
-                );
-              },
+              onDone: () => processStatusNotifier.setEnabled(message: ''),
             ),
           ],
         ),
