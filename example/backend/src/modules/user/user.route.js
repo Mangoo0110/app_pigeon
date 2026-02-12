@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { profile, updateProfile } from "../controllers/user_controller.js";
-import { isAuthenticated } from "../middleware/auth.js";
-import { upload } from "../middleware/upload.js";
+import { profile, updateProfile } from "./user.controller.js";
+import { isAuthenticated } from "../../shared/middleware/auth.js";
+import { upload } from "../../shared/middleware/upload.js";
 
 const router = Router();
 
