@@ -41,26 +41,6 @@ class AuthLoading extends AuthStatus{
   }
 }
 
-class NotVerified extends AuthStatus {
-  final String userId;
-  
-  NotVerified({required this.userId});
-
-  @override
-  String toString() {
-    return 'EmailVerification(userId: $userId)';
-  }
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-
-    return other is NotVerified && other.userId == userId;
-  }
-
-  @override
-  int get hashCode => userId.hashCode;
-}
-
 class Authenticated extends AuthStatus {
   final Auth auth;
 
@@ -86,27 +66,6 @@ class Authenticated extends AuthStatus {
   @override
   int get hashCode => auth.hashCode;
 }
-
-// class NotVerified extends AuthStatus {
-//   final String userId;
-  
-//   NotVerified({required this.userId});
-
-//   @override
-//   String toString() {
-//     return 'EmailVerification(userId: $userId)';
-//   }
-//   @override
-//   bool operator ==(Object other) {
-//     if (identical(this, other)) return true;
-
-//     return other is NotVerified && other.userId == userId;
-//   }
-
-//   @override
-//   int get hashCode => userId.hashCode;
-// }
-
 
 
 class AuthError extends AuthStatus {

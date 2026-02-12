@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:app_pigeon/src/auth/interface/auth_storage_interface.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:socket_io_client/socket_io_client.dart' as io;
 import 'auth/interface/current_auth_uid_manager_interface.dart';
@@ -53,13 +54,20 @@ class AppPigeon with _ErrorHandler {
       DebugLabel.socketService
     },
   }) {
+    // Set base url
+    _dio.options.baseUrl = baseUrl;
+    _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
+    _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
+    // Initialize and add interceptor
+    _apiCallInterceptor = ApiCallInterceptor(_authStorage, _dio, refreshTokenManager);
+    _dio.interceptors.add(_apiCallInterceptor);
     _init(connectTimeout: connectTimeout, receiveTimeout: receiveTimeout, onError: onError);
   }
 
   final Dio _dio = Dio();
   final Set<DebugLabel> allowOnly;
   final SocketService _socketService = SocketService();
-  late final AuthStorageInterface _authService = AuthService();
+  late final AuthStorageInterface _authStorage = AuthStorage();
   final RefreshTokenManagerInterface refreshTokenManager;
   late final ApiCallInterceptor _apiCallInterceptor;
   final String baseUrl;
@@ -72,15 +80,11 @@ class AppPigeon with _ErrorHandler {
   }) async {
     await runGuarded(
       () async {
-        // Set base url
-        _dio.options.baseUrl = baseUrl;
-        _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
-        _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
-        // Initialize and add interceptor
-        _dio.interceptors.add(_apiCallInterceptor);
-        _apiCallInterceptor = ApiCallInterceptor(_authService, _dio, refreshTokenManager);
-        _dio.interceptors.add(_apiCallInterceptor);
-        _authService.init();
+        debugPrint("Initializing AppPigeon");
+        
+        // Initialize auth storage
+        debugPrint("Calling init() on AuthStorage");
+        _authStorage.init();
       },
       onError: onError,
       rethrowError: false,
@@ -89,40 +93,40 @@ class AppPigeon with _ErrorHandler {
   
 
   dispose() {
-    _authService.dispose();
+    _authStorage.dispose();
     _socketService._disposeSocket();
   }
 
-  Stream<AuthStatus> get authStream => _authService.authStream;
+  Stream<AuthStatus> get authStream => _authStorage.authStream;
 
   Future<void> saveNewAuth({required SaveNewAuthParams saveAuthParams}) async {
-    await _authService.saveNewAuth(saveAuthParams);
+    await _authStorage.saveNewAuth(saveAuthParams);
   }
 
   Future<void> updateCurrentAuth({
     required UpdateAuthParams updateAuthParams,
   }) async {
-    await _authService.updateCurrentAuth(updateAuthParams);
+    await _authStorage.updateCurrentAuth(updateAuthParams);
   }
 
   /// Returns the current auth record stored.
   Future<Auth?> getCurrentAuthRecord() async {
-    return await _authService.getCurrentAuth();
+    return await _authStorage.getCurrentAuth();
   }
 
   /// Returns all saved separate auth records that are stored locally.
   Future<List<Auth>> getAllAuthRecords() async {
-    return await _authService.getAllAuth();
+    return await _authStorage.getAllAuth();
   }
 
   /// This will remove the current auth reference and data stored locally.
   Future<void> logOut() async {
-    await _authService.clearCurrentAuthRecord();
+    await _authStorage.clearCurrentAuthRecord();
   }
 
   /// Switches current auth by uid.
   Future<void> switchAccount({required String uid}) async {
-    await _authService.switchCurrentAuth(uid: uid);
+    await _authStorage.switchAccount(uid: uid);
   }
 
   // Public GET/POST/PUT/DELETE [DIO] wrappers
@@ -224,7 +228,7 @@ class AppPigeon with _ErrorHandler {
   Future<void> socketInit(SocketConnetParamX param) async {
     final token =
         param.token ??
-        (await _authService.getCurrentAuth())?._accessToken;
+        (await _authStorage.getCurrentAuth())?._accessToken;
     if (token == null) {
       return;
     }

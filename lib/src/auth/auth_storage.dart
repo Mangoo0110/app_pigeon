@@ -9,8 +9,8 @@ class _AuthStatusDecider {
   }
 }
 
-base class AuthService implements AuthStorageInterface{
-  AuthService(){
+base class AuthStorage implements AuthStorageInterface{
+  AuthStorage(){
     _authStreamController.add(AuthLoading());
     _authManager = _AuthManger( _secureStorage, _authDebugger);
     _currentAuthUidManager = _CurrentAuthUidManger(_secureStorage);
@@ -35,7 +35,9 @@ base class AuthService implements AuthStorageInterface{
   /// Initializes auth storage listening, updates auth stream on change in secure storage
   @override
   init() async{
+    debugPrint("Initializing auth storage");
     await getCurrentAuth().then((currentAuth) async{
+      debugPrint("Current auth: $currentAuth");
       final AuthStatus authStatus = _AuthStatusDecider.get(currentAuth);
       _authStreamController.add(authStatus);
     });
@@ -133,6 +135,16 @@ base class AuthService implements AuthStorageInterface{
   
   @override
   Stream<AuthStatus> get authStream => _authStreamController.stream;
+  
+  @override
+  Future<void> switchAccount({required String uid}) async{
+    final auth = await _authManager.read(uId: uid);
+    if (auth == null) {
+      throw Exception("Auth with uid $uid does not exist.");
+    }
+    await _currentAuthUidManager.saveCurrentAuthRef(uid);
+    await getCurrentAuth();
+  }
   
 }
 
