@@ -1,4 +1,5 @@
 import User from "../model/user.model.js";
+import Auth from "../model/auth.model.js";
 import AppError from "../error/app_error.js";
 import catchAsync from "../utils/catch_async.js";
 import cloudinary from "../utils/cloudinary.js";
@@ -15,7 +16,15 @@ export const profile = catchAsync(async (req, res) => {
     throw new AppError(404, "User not found");
   }
 
-  res.json({ data: user });
+  const auth = await Auth.findOne({ userId: user._id });
+  const isVerified = auth?.emailVerified ?? user.emailVerified ?? false;
+
+  res.json({
+    data: {
+      ...user.toObject(),
+      isVerified,
+    },
+  });
 });
 
 export const updateProfile = catchAsync(async (req, res) => {

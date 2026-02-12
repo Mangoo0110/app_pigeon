@@ -5,7 +5,6 @@ import User from "../model/user.model.js";
 import Auth from "../model/auth.model.js";
 import AppError from "../error/app_error.js";
 import catchAsync from "../utils/catch_async.js";
-import nodeMailer from "nodemailer";
 import {sendVerificationMail} from "../utils/send_mail.js";
 import {verificationOtpHtml} from "../utils/html.js";
 
@@ -34,6 +33,14 @@ export const register = catchAsync(async (req, res) => {
     throw new AppError(400, "Password is required");
   }
 
+  // Username must be lowercase letters and numbers only.
+  if (!String(userName).trim().match(/^[a-z0-9]+$/)) {
+    throw new AppError(
+      400,
+      "Username can only contain lowercase letters and numbers"
+    );
+  }
+
   const normalizedEmail = String(email).toLowerCase().trim();
   const normalizedUserName = String(userName).toLowerCase().trim();
 
@@ -58,7 +65,8 @@ export const register = catchAsync(async (req, res) => {
       verificationOtpHtml({ name: userName, otp, expiry: otpExpiry })
     );
   } catch (e) {
-    throw new AppError(500, "Failed to send verification email");
+    const reason = e?.message ? ` Reason: ${e.message}` : "";
+    throw new AppError(500, `Failed to send verification email!${reason}`);
   }
 
   const newUser = new User({
@@ -101,12 +109,19 @@ export const login = catchAsync(async (req, res) => {
     { refreshToken, refreshTokenExpiresAt },
     { upsert: true, new: true, setDefaultsOnInsert: true }
   );
+  const auth = await Auth.findOne({ userId: user._id });
+  const isVerified = auth?.emailVerified ?? user.emailVerified ?? false;
 
   res.json({
     data: {
-      userId: user._id,
+      userId: user._id.toString(),
+      user_id: user._id.toString(),
       accessToken,
+      access_token: accessToken,
       refreshToken,
+      refresh_token: refreshToken,
+      isVerified,
+      is_verified: isVerified,
     },
   });
 });
@@ -143,12 +158,18 @@ export const refresh = catchAsync(async (req, res) => {
   await auth.save();
 
   const accessToken = signAccessToken(user);
+  const isVerified = auth.emailVerified ?? user.emailVerified ?? false;
 
   res.json({
     data: {
-      userId: user._id,
+      userId: user._id.toString(),
+      user_id: user._id.toString(),
       accessToken,
+      access_token: accessToken,
       refreshToken: newRefreshToken,
+      refresh_token: newRefreshToken,
+      isVerified,
+      is_verified: isVerified,
     },
   });
 });
