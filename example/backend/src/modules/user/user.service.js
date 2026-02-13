@@ -17,8 +17,19 @@ export const getProfileByUserId = async ({ userId }) => {
   const auth = await Auth.findOne({ userId: user._id });
   const isVerified = auth?.emailVerified ?? user.emailVerified ?? false;
 
+  const id = user._id.toString();
+  const userName = String(user.userName || "").trim();
+  const fullName = String(user.fullName || "").trim();
+  const email = String(user.email || "").trim();
+
   return {
-    ...user.toObject(),
+    id,
+    uid: id,
+    userName,
+    fullName,
+    email,
+    avatarUrl: user.avatarUrl ?? null,
+    role: user.role ?? "staff",
     isVerified,
   };
 };

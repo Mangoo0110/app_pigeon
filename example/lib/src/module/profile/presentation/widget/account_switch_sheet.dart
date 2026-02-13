@@ -1,6 +1,8 @@
 import 'package:app_pigeon/app_pigeon.dart';
 import 'package:flutter/material.dart';
 
+import '../../model/profile/profile.dart';
+
 class AccountSwitchSheet extends StatefulWidget {
   const AccountSwitchSheet({
     super.key,
@@ -13,7 +15,7 @@ class AccountSwitchSheet extends StatefulWidget {
     required this.onLogout,
   });
 
-  final Map<String, dynamic> profile;
+  final Profile profile;
   final List<Auth> accounts;
   final String? currentAccountUid;
   final Future<void> Function(String fullName) onSaveProfile;
@@ -33,7 +35,7 @@ class _AccountSwitchSheetState extends State<AccountSwitchSheet> {
   void initState() {
     super.initState();
     _fullNameController = TextEditingController(
-      text: _value(widget.profile, ["fullName", "full_name", "name"]) ?? "",
+      text: widget.profile.fullName,
     );
   }
 
@@ -45,13 +47,9 @@ class _AccountSwitchSheetState extends State<AccountSwitchSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final email =
-        _value(widget.profile, ["email", "email_address", "emailAddress"]) ??
-            "Unknown";
-    final userId =
-        _value(widget.profile, ["user_id", "userId", "uid", "id"]) ?? "-";
-    final isVerified = widget.profile["isVerified"] == true ||
-        widget.profile["is_verified"] == true;
+    final email = widget.profile.email.isNotEmpty ? widget.profile.email : "Unknown";
+    final userId = widget.profile.uid.isNotEmpty ? widget.profile.uid : "-";
+    final isVerified = widget.profile.isVerified;
 
     return SafeArea(
       child: Padding(

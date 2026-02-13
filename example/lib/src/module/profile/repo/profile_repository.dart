@@ -1,9 +1,12 @@
 import 'package:example/src/core/api_handler/api_handler.dart';
 import 'package:example/src/core/api_handler/api_response.dart';
 
+import '../model/profile/profile.dart';
+import '../model/update_profile_request/update_profile_request.dart';
+
 abstract class ProfileRepository with ErrorHandler {
-  AsyncRequest<Map<String, dynamic>> fetchProfile();
-  AsyncRequest<void> updateProfile({required String fullName});
+  AsyncRequest<Profile> fetchProfile();
+  AsyncRequest<void> updateProfile(UpdateProfileRequest request);
 }
 
 class ProfileRepositoryStub extends ProfileRepository {
@@ -16,14 +19,14 @@ class ProfileRepositoryStub extends ProfileRepository {
   }
 
   @override
-  AsyncRequest<Map<String, dynamic>> fetchProfile() {
-    return Future<ApiResponse<Map<String, dynamic>>>.value(
+  AsyncRequest<Profile> fetchProfile() {
+    return Future<ApiResponse<Profile>>.value(
       _notImplemented('Fetch profile'),
     );
   }
 
   @override
-  AsyncRequest<void> updateProfile({required String fullName}) {
+  AsyncRequest<void> updateProfile(UpdateProfileRequest request) {
     return Future<ApiResponse<void>>.value(_notImplemented('Update profile'));
   }
 }
