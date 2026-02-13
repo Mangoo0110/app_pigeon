@@ -1,4 +1,4 @@
-part of '../app_pigeon.dart';
+part of '../authorized_app_pigeon.dart';
 
 class _AuthStatusDecider {
   static AuthStatus get(Auth? auth) {
@@ -23,7 +23,7 @@ base class AuthStorage implements AuthStorageInterface{
     iOptions: IOSOptions(
       accessibility: KeychainAccessibility.first_unlock
     ));
-  final Debugger _authDebugger = AuthServiceDebugger();
+  final Debugger _authDebugger = PigeonServiceDebugger();
   final StreamController<AuthStatus> _authStreamController = StreamController.broadcast();
 
   @override
