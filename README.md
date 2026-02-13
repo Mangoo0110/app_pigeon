@@ -2,10 +2,10 @@
 
 `app_pigeon` is a Flutter networking and socket layer with two operation modes:
 
-1. `AuthorizedAppPigeon`: token-based HTTP + auth persistence + refresh flow.
-2. `GhostAppPigeon`: lightweight HTTP + socket client for anonymous/guest/ghost use cases.
+1. `AuthorizedPigeon`: token-based HTTP + auth persistence + refresh flow.
+2. `GhostPigeon`: lightweight HTTP + socket client for anonymous/guest/ghost use cases.
 
-The package exposes a shared `AppPigeon` interface so app code can depend on a common contract while switching implementations at runtime.
+The package exposes a shared `AppPigeon` interface so app code can depend on one contract while switching implementations at runtime. It acts as your reusable API client foundation, instead of rebuilding the same networking layer from scratch for every new REST API project.
 
 ## Capabilities
 
@@ -38,8 +38,8 @@ dependencies:
 `package:app_pigeon/app_pigeon.dart` exports:
 
 1. `AppPigeon` (interface)
-2. `AuthorizedAppPigeon`
-3. `GhostAppPigeon`
+2. `AuthorizedPigeon`
+3. `GhostPigeon`
 4. `SocketConnetParamX`
 5. `RefreshTokenManagerInterface`, `RefreshTokenResponse`
 6. `dio` types
@@ -71,7 +71,7 @@ class SocketConnetParamX {
 
 ## Authorized Mode
 
-Use `AuthorizedAppPigeon` when your API requires authentication and token refresh.
+Use `AuthorizedPigeon` when your API requires authentication and token refresh.
 
 ### Setup
 
@@ -108,7 +108,7 @@ class MyRefreshTokenManager implements RefreshTokenManagerInterface {
   }
 }
 
-final authorized = AuthorizedAppPigeon(
+final authorized = AuthorizedPigeon(
   MyRefreshTokenManager(),
   baseUrl: 'https://api.example.com',
 );
@@ -174,12 +174,12 @@ authorized.emit('message', {'text': 'hello'});
 
 ## Ghost Mode
 
-Use `GhostAppPigeon` for anonymous/ghost flows where full auth persistence is not needed.
+Use `GhostPigeon` for anonymous/ghost flows where full auth persistence is not needed.
 
 ### Setup
 
 ```dart
-final ghost = GhostAppPigeon(
+final ghost = GhostPigeon(
   baseUrl: 'https://api.example.com',
 );
 ```
@@ -228,8 +228,8 @@ ghost.emit('ghost_message', {
 
 Common architecture in apps:
 
-1. Keep one `AuthorizedAppPigeon`.
-2. Keep one `GhostAppPigeon`.
+1. Keep one `AuthorizedPigeon`.
+2. Keep one `GhostPigeon`.
 3. Expose an app-level active resolver.
 4. Repositories call the currently active client at runtime.
 
@@ -282,11 +282,11 @@ For ghost identity flows, typical endpoints:
 ## Minimal End-to-End Example
 
 ```dart
-final authorized = AuthorizedAppPigeon(
+final authorized = AuthorizedPigeon(
   MyRefreshTokenManager(),
   baseUrl: 'https://api.example.com',
 );
-final ghost = GhostAppPigeon(baseUrl: 'https://api.example.com');
+final ghost = GhostPigeon(baseUrl: 'https://api.example.com');
 
 // Use authorized client
 await authorized.post('/auth/login', data: {...});
@@ -322,4 +322,3 @@ This repository includes an `example/` app and example backend showing:
 2. multi-account switching
 3. ghost identity flow
 4. realtime universal chat
-
