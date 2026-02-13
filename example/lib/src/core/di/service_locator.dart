@@ -7,6 +7,8 @@ import '../../module/auth/repo/auth_repository.dart';
 import '../../module/auth/repo/refresh_token_manager_stub.dart';
 import '../../module/chat/repo/chat_repo_impl.dart';
 import '../../module/chat/repo/chat_repository.dart';
+import '../../module/profile/repo/profile_repo_impl.dart';
+import '../../module/profile/repo/profile_repository.dart';
 
 final GetIt serviceLocator = GetIt.instance;
 
@@ -18,5 +20,6 @@ Future<void> setupServiceLocator() async{
   serviceLocator.registerSingleton<AppPigeon>(appPigeon);
   serviceLocator.registerSingleton<AuthRepository>(AuthRepoImpl(appPigeon));
   serviceLocator.registerSingleton<ChatRepository>(ChatRepoImpl(appPigeon));
+  serviceLocator.registerSingleton<ProfileRepository>(ProfileRepoImpl(appPigeon));
 
 }

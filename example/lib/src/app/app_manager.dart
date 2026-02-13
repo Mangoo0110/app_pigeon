@@ -39,7 +39,7 @@ class AppManager {
     if (newAuth != null) {
       // Authenticated user
       currentAuth.value = newAuth;
-      navigatorKey.currentState?.pushNamedAndRemoveUntil(RouteNames.app.path, (route) => false);
+      AppRouter.navigateToReplacement(RouteNames.app, newAuth);
       _initializeGlobalDataProviders();
     } else {
       // Set current auth to null

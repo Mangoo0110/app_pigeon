@@ -38,10 +38,22 @@ class ChatRepoImpl extends ChatRepository {
       appPigeon.listen(_messageChannel).map(_parseSocketMessage);
 
   @override
-  AsyncRequest<void> sendMessage(SendMessageParam message) {
+  AsyncRequest<void> sendMessage(
+    SendMessageParam message, {
+    required String senderId,
+    required String senderName,
+  }) {
     return asyncTryCatch(
       tryFunc: () async {
-        appPigeon.emit(_messageChannel, message.toJson());
+        appPigeon.emit(_messageChannel, <String, dynamic>{
+          ...message.toJson(),
+          'message': message.text,
+          'sentAt': DateTime.now().toIso8601String(),
+          'sender': <String, dynamic>{
+            'id': senderId,
+            'name': senderName,
+          },
+        });
         return SuccessResponse<void>(
           data: null,
           message: 'Message sent.',
@@ -83,18 +95,5 @@ class ChatRepoImpl extends ChatRepository {
     }
 
     return const Sender(id: 'unknown', name: 'Unknown');
-  }
-
-  Map<String, dynamic> _buildPayload(ChatMessage message) {
-    return <String, dynamic>{
-      'message': message.text,
-      'text': message.text,
-      'sender': <String, dynamic>{
-        'id': message.sender.id,
-        'name': message.sender.name,
-        'profileImage': message.sender.profileImage,
-      },
-      'sentAt': message.sentAt.toIso8601String(),
-    };
   }
 }
