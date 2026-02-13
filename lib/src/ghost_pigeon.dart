@@ -8,8 +8,8 @@ import 'socket/socket_service.dart';
 
 part 'network/ghost_api_call_interceptor.dart';
 
-class GhostAppPigeon with PigeonErrorHandler implements AppPigeon {
-  GhostAppPigeon({
+class GhostPigeon with PigeonErrorHandler implements AppPigeon {
+  GhostPigeon({
     int connectTimeout = 15000,
     int receiveTimeout = 15000,
     required this.baseUrl,
@@ -60,6 +60,11 @@ class GhostAppPigeon with PigeonErrorHandler implements AppPigeon {
 
   @override
   void dispose() {
+    _socketService.dispose();
+  }
+
+  /// Disconnects ghost socket listeners/connection.
+  void disconnectSocket() {
     _socketService.dispose();
   }
 

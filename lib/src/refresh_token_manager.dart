@@ -1,5 +1,6 @@
 
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 base class RefreshTokenResponse {
   final String accessToken;
@@ -37,12 +38,26 @@ class BasicRefreshTokenManager extends RefreshTokenManagerInterface {
   }
   
   @override
-  Future<RefreshTokenResponse> refreshToken({required String refreshToken, required Dio dio}) {
-    // TODO: implement refreshToken
-    throw UnimplementedError();
-  }
+  Future<RefreshTokenResponse> refreshToken({required String refreshToken, required Dio dio}) async{
+    debugPrint("Refreshing token with $refreshToken");
+    final res = await dio.post(
+      url,
+      data: {
+        'refreshToken': refreshToken,
+      },
+    );
 
-  
+    debugPrint("Refresh token response: ${res.data}");
+
+    debugPrint(res.data.toString());
+    
+
+    return RefreshTokenResponse(
+      accessToken: res.data["data"]['accessToken'],
+      refreshToken: res.data["data"]['refreshToken'],
+      data: res.data["data"],
+    );
+  }
 
 }
 

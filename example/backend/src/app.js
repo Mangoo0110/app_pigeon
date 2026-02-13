@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./modules/auth/auth.route.js";
 import userRoutes from "./modules/user/user.route.js";
+import chatRoutes from "./modules/chat/chat.route.js";
 import globalErrorHandler from "./shared/middleware/global_error_handler.js";
 
 const app = express();
@@ -18,6 +19,7 @@ app.get("/health", (_req, res) => {
 
 api.use("/auth", authRoutes);
 api.use("/user", userRoutes);
+api.use("/chat", chatRoutes);
 
 app.use("/api/v1", api); 
 
