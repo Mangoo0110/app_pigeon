@@ -1,16 +1,43 @@
 import 'package:app_pigeon/app_pigeon.dart';
+import 'package:example/src/core/constants/api_endpoints.dart';
+import 'package:flutter/widgets.dart';
 
-class RefreshTokenManagerStub implements RefreshTokenManagerInterface {
+class MyRefreshTokenManager implements RefreshTokenManagerInterface {
   @override
   final String url;
 
-  RefreshTokenManagerStub({this.url = '/auth/refresh'});
+  MyRefreshTokenManager():url = ApiEndpoints.refreshToken;
 
   @override
   Future<RefreshTokenResponse> refreshToken({
     required String refreshToken,
     required Dio dio,
   }) async {
-    throw UnimplementedError('Refresh token API is not implemented yet.');
+    debugPrint("Refreshing token with $refreshToken");
+    final res = await dio.post(
+      url,
+      data: {
+        'refreshToken': refreshToken,
+      },
+    );
+
+    debugPrint("Refresh token response: ${res.data}");
+
+    debugPrint(res.data.toString());
+    
+
+    return RefreshTokenResponse(
+      accessToken: res.data["data"]['accessToken'],
+      refreshToken: res.data["data"]['refreshToken'],
+      data: res.data["data"],
+    );
+  }
+  
+  @override
+  Future<bool> shouldRefresh(DioException err, ErrorInterceptorHandler handler) async{
+    if(err.response?.statusCode == 401) {
+      return true;
+    }
+    return false;
   }
 }

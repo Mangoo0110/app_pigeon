@@ -12,7 +12,7 @@ final GetIt serviceLocator = GetIt.instance;
 
 Future<void> setupServiceLocator() async{
   final appPigeon = AppPigeon(
-    RefreshTokenManagerStub(),
+    MyRefreshTokenManager(),
     baseUrl: ApiEndpoints.baseUrl,
   );
   serviceLocator.registerSingleton<AppPigeon>(appPigeon);
