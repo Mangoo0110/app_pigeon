@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:app_pigeon/src/auth/interface/auth_storage_interface.dart';
+import 'package:app_pigeon/src/interface/authorization.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -19,8 +20,8 @@ part 'network/api_call_interceptor.dart';
 
 
 
-class AuthorizedAppPigeon with PigeonErrorHandler implements AppPigeon {
-  AuthorizedAppPigeon(
+class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorization {
+  AuthorizedPigeon(
     this.refreshTokenManager, {
     int connectTimeout = 15000, // milliseconds
     int receiveTimeout = 15000, // milliseconds
@@ -82,12 +83,15 @@ class AuthorizedAppPigeon with PigeonErrorHandler implements AppPigeon {
     _socketService.dispose();
   }
 
+  @override
   Stream<AuthStatus> get authStream => _authStorage.authStream;
 
+  @override
   Future<void> saveNewAuth({required SaveNewAuthParams saveAuthParams}) async {
     await _authStorage.saveNewAuth(saveAuthParams);
   }
 
+  @override
   Future<void> updateCurrentAuth({
     required UpdateAuthParams updateAuthParams,
   }) async {
@@ -95,21 +99,25 @@ class AuthorizedAppPigeon with PigeonErrorHandler implements AppPigeon {
   }
 
   /// Returns the current auth record stored.
+  @override
   Future<Auth?> getCurrentAuthRecord() async {
     return await _authStorage.getCurrentAuth();
   }
 
   /// Returns all saved separate auth records that are stored locally.
+  @override
   Future<List<Auth>> getAllAuthRecords() async {
     return await _authStorage.getAllAuth();
   }
 
   /// This will remove the current auth reference and data stored locally.
+  @override
   Future<void> logOut() async {
     await _authStorage.clearCurrentAuthRecord();
   }
 
   /// Switches current auth by uid.
+  @override
   Future<void> switchAccount({required String uid}) async {
     await _authStorage.switchAccount(uid: uid);
   }
@@ -214,7 +222,7 @@ class AuthorizedAppPigeon with PigeonErrorHandler implements AppPigeon {
   /// If no current auth record is found, socket will not be initialized.
   /// 
   /// ### NOTE:: If you want to see debug logs from socket service,
-  /// ### make sure to add [DebugLabel.socketService] to the [allowOnly] set, while setting up your [AuthorizedAppPigeon]
+  /// ### make sure to add [DebugLabel.socketService] to the [allowOnly] set, while setting up your [AuthorizedPigeon]
   @override
   Future<void> socketInit(SocketConnetParamX param) async {
     final token =
