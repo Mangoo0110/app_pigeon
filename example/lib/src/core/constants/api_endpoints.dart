@@ -21,7 +21,14 @@ base class ApiEndpoints {
   /// ### get
   static const String userProfile = "$_userRoute/profile";
 
-  // ---------------------- Message -----------------------------
+  // ---------------------- CHAT -----------------------------
+  static const String _chatRoute = '${ApiEndpoints.baseUrl}/chat';
+  static const String chatMessages = '$_chatRoute/messages';
+  static const String ghostChatMessages = '$_chatRoute/ghost/messages';
+  static const String ghostCheckUsername = '$_chatRoute/ghost/check-username';
+  static const String ghostSession = '$_chatRoute/ghost/session';
+  static const String ghostRegister = '$_chatRoute/ghost/register';
+  static const String ghostLogin = '$_chatRoute/ghost/login';
 
 }
 

@@ -1,6 +1,8 @@
 import 'package:app_pigeon/app_pigeon.dart';
 import 'package:flutter/material.dart';
 
+import '../../app/routing/app_router.dart';
+import '../../app/routing/route_names.dart';
 import '../../core/api_handler/api_response.dart';
 import '../../core/di/service_locator.dart';
 import '../../module/auth/model/authenticated_user.dart';
@@ -8,6 +10,8 @@ import '../../module/auth/presentation/screen/login_screen.dart';
 import '../../module/auth/repo/auth_repository.dart';
 import '../../module/chat/presentation/widget/universal_chat_module.dart';
 import '../../module/chat/repo/chat_repository.dart';
+import '../../module/profile/model/profile/profile.dart';
+import '../../module/profile/model/update_profile_request/update_profile_request.dart';
 import '../../module/profile/presentation/widget/account_switch_sheet.dart';
 import '../../module/profile/presentation/widget/profile_avatar_action.dart';
 import '../../module/profile/repo/profile_repository.dart';
@@ -26,7 +30,7 @@ class AuthenticatedHomeScreen extends StatefulWidget {
 }
 
 class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
-  Map<String, dynamic> _profile = <String, dynamic>{};
+  Profile _profile = Profile.empty;
   List<Auth> _accounts = const <Auth>[];
   bool _loading = true;
   bool _socketReady = false;
@@ -46,6 +50,21 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
     if (!mounted) return;
     setState(() => _loading = true);
 
+    if (widget.currentAuth.isGuest) {
+      _accounts = const <Auth>[];
+      _profile = Profile(
+        id: widget.currentAuth.uid,
+        uid: widget.currentAuth.uid,
+        userName: widget.currentAuth.userName,
+        fullName: widget.currentAuth.userName,
+        email: '',
+        isVerified: true,
+      );
+      setState(() => _loading = false);
+      await _initChatSocket();
+      return;
+    }
+
     final authRepo = serviceLocator<AuthRepository>();
     final profileRepo = serviceLocator<ProfileRepository>();
 
@@ -55,9 +74,9 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
     final accounts = accountsRes is SuccessResponse<List<Auth>>
         ? (accountsRes.data ?? <Auth>[])
         : <Auth>[];
-    final profile = profileRes is SuccessResponse<Map<String, dynamic>>
-        ? (profileRes.data ?? <String, dynamic>{})
-        : <String, dynamic>{};
+    final profile = profileRes is SuccessResponse<Profile>
+        ? (profileRes.data ?? Profile.empty)
+        : Profile.empty;
 
     if (!mounted) return;
     _accounts = accounts;
@@ -78,7 +97,9 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
   }
 
   Future<void> _saveProfile(String fullName) async {
-    await serviceLocator<ProfileRepository>().updateProfile(fullName: fullName);
+    await serviceLocator<ProfileRepository>().updateProfile(
+      UpdateProfileRequest(fullName: fullName),
+    );
     await _loadDashboard();
   }
 
@@ -122,27 +143,41 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
     await _loadDashboard();
   }
 
+  Future<void> _goToLoginFromGuest() async {
+    ghostPigeon.disconnectSocket();
+    serviceLocator<ActivePigeonResolver>().useGhost();
+    await AppRouter.navigateToReplacement(RouteNames.login);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final name = _firstNonEmptyString(
-          _profile,
-          ["fullName", "name", "userName", "email"],
-        ) ??
-        widget.currentAuth.userName;
+    final name = _profile.fullName.isNotEmpty
+        ? _profile.fullName
+        : (_profile.userName.isNotEmpty
+              ? _profile.userName
+              : widget.currentAuth.userName);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Universal Chat"),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadDashboard,
-          ),
-          ProfileAvatarAction(
-            label: name,
-            onTap: _openProfileSheet,
-          ),
-        ],
+        actions: widget.currentAuth.isGuest
+            ? [
+                TextButton.icon(
+                  onPressed: _goToLoginFromGuest,
+                  icon: const Icon(Icons.login),
+                  label: const Text('Login'),
+                ),
+              ]
+            : [
+                IconButton(
+                  icon: const Icon(Icons.refresh),
+                  onPressed: _loadDashboard,
+                ),
+                ProfileAvatarAction(
+                  label: name,
+                  onTap: _openProfileSheet,
+                ),
+              ],
       ),
       body: SafeArea(
         child: _loading
@@ -150,18 +185,12 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
             : Padding(
                 padding: const EdgeInsets.all(16),
                 child: UniversalChatModule(
-                  senderId:
-                      _firstNonEmptyString(
-                        _profile,
-                        ["user_id", "userId", "uid", "id"],
-                      ) ??
-                      widget.currentAuth.uid,
-                  senderName:
-                      _firstNonEmptyString(
-                        _profile,
-                        ["userName", "fullName", "email", "user_id", "uid"],
-                      ) ??
-                      widget.currentAuth.userName,
+                  senderId: _profile.uid.isNotEmpty
+                      ? _profile.uid
+                      : widget.currentAuth.uid,
+                  senderName: _profile.userName.isNotEmpty
+                      ? _profile.userName
+                      : widget.currentAuth.userName,
                 ),
               ),
       ),

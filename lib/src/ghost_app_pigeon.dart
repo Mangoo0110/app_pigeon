@@ -63,6 +63,11 @@ class GhostAppPigeon with PigeonErrorHandler implements AppPigeon {
     _socketService.dispose();
   }
 
+  /// Disconnects ghost socket listeners/connection.
+  void disconnectSocket() {
+    _socketService.dispose();
+  }
+
   @override
   Future<Response> get(
     String path, {
