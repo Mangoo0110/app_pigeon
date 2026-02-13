@@ -21,5 +21,28 @@ abstract interface class RefreshTokenManagerInterface {
   /// This gets called by [AuthService] on expire of access-token.
   Future<RefreshTokenResponse> refreshToken({required String refreshToken, required Dio dio});
 
+  Future<bool> shouldRefresh(DioException err, ErrorInterceptorHandler handler);
+
+}
+
+class BasicRefreshTokenManager extends RefreshTokenManagerInterface {
+  BasicRefreshTokenManager(super.url);
+  
+  @override
+  Future<bool> shouldRefresh(DioException err, ErrorInterceptorHandler handler) async{
+    if(err.response?.statusCode == 401) {
+      return true;
+    }
+    return false;
+  }
+  
+  @override
+  Future<RefreshTokenResponse> refreshToken({required String refreshToken, required Dio dio}) {
+    // TODO: implement refreshToken
+    throw UnimplementedError();
+  }
+
+  
+
 }
 
