@@ -15,7 +15,7 @@ class ChatRepoImpl extends ChatRepository {
   AppPigeon get _appPigeon => _appPigeonResolver();
   static const String _authorizedMessageChannel = 'message';
   static const String _ghostMessageChannel = 'ghost_message';
-  bool get _isGhostMode => _appPigeon is GhostAppPigeon;
+  bool get _isGhostMode => _appPigeon is GhostPigeon;
   String get _messageChannel =>
       _isGhostMode ? _ghostMessageChannel : _authorizedMessageChannel;
 

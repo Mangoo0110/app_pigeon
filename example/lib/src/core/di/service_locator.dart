@@ -14,10 +14,10 @@ final GetIt serviceLocator = GetIt.instance;
 const String kAuthorizedPigeon = 'authorized_pigeon';
 const String kGhostPigeon = 'ghost_pigeon';
 
-AuthorizedAppPigeon get authorizedPigeon =>
-    serviceLocator<AuthorizedAppPigeon>();
-GhostAppPigeon get ghostPigeon =>
-    serviceLocator<GhostAppPigeon>();
+AuthorizedPigeon get authorizedPigeon =>
+    serviceLocator<AuthorizedPigeon>();
+GhostPigeon get ghostPigeon =>
+    serviceLocator<GhostPigeon>();
 AppPigeon get authorizedClient =>
     serviceLocator<AppPigeon>(instanceName: kAuthorizedPigeon);
 AppPigeon get ghostClient =>
@@ -47,14 +47,14 @@ Future<void> setupServiceLocator() async{
     return;
   }
 
-  final authorized = AuthorizedAppPigeon(
+  final authorized = AuthorizedPigeon(
     MyRefreshTokenManager(),
     baseUrl: ApiEndpoints.baseUrl,
   );
-  final ghost = GhostAppPigeon(baseUrl: ApiEndpoints.baseUrl);
+  final ghost = GhostPigeon(baseUrl: ApiEndpoints.baseUrl);
 
-  serviceLocator.registerSingleton<AuthorizedAppPigeon>(authorized);
-  serviceLocator.registerSingleton<GhostAppPigeon>(ghost);
+  serviceLocator.registerSingleton<AuthorizedPigeon>(authorized);
+  serviceLocator.registerSingleton<GhostPigeon>(ghost);
 
   // Named interface registrations to support dual-mode use cases.
   serviceLocator.registerSingleton<AppPigeon>(

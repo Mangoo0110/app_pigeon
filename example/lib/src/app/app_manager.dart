@@ -19,8 +19,8 @@ class AppManager {
   bool _thirdPartyLogin = false;
 
   ValueNotifier<AuthenticatedUser?> currentAuth = ValueNotifier(null);
-  AuthorizedAppPigeon get authorizedPigeonClient => authorizedPigeon;
-  GhostAppPigeon get ghostPigeonClient => ghostPigeon;
+  AuthorizedPigeon get authorizedPigeonClient => authorizedPigeon;
+  GhostPigeon get ghostPigeonClient => ghostPigeon;
   ActivePigeonResolver get _activePigeonResolver =>
       serviceLocator<ActivePigeonResolver>();
 
