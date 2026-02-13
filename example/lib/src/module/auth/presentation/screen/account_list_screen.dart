@@ -51,7 +51,7 @@ class _AccountListScreenState extends State<AccountListScreen> {
       }
       return response.data ?? <Auth>[];
     });
-    _currentFuture = serviceLocator<AuthorizedAppPigeon>().getCurrentAuthRecord();
+    _currentFuture = serviceLocator<AuthorizedPigeon>().getCurrentAuthRecord();
   }
 
   Future<void> _refresh() async {

@@ -11,8 +11,13 @@ import 'chat_repository.dart';
 class ChatRepoImpl extends ChatRepository {
   ChatRepoImpl(this.appPigeon);
 
-  final AppPigeon appPigeon;
-  static const String _messageChannel = 'message';
+  final AppPigeon Function() _appPigeonResolver;
+  AppPigeon get _appPigeon => _appPigeonResolver();
+  static const String _authorizedMessageChannel = 'message';
+  static const String _ghostMessageChannel = 'ghost_message';
+  bool get _isGhostMode => _appPigeon is GhostPigeon;
+  String get _messageChannel =>
+      _isGhostMode ? _ghostMessageChannel : _authorizedMessageChannel;
 
   @override
   AsyncRequest<void> connectToUniversalChat({String joinId = 'global_chat'}) {

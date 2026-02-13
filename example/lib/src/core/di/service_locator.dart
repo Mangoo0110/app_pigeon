@@ -11,21 +11,73 @@ import '../../module/profile/repo/profile_repo_impl.dart';
 import '../../module/profile/repo/profile_repository.dart';
 
 final GetIt serviceLocator = GetIt.instance;
+const String kAuthorizedPigeon = 'authorized_pigeon';
+const String kGhostPigeon = 'ghost_pigeon';
+
+AuthorizedPigeon get authorizedPigeon =>
+    serviceLocator<AuthorizedPigeon>();
+GhostPigeon get ghostPigeon =>
+    serviceLocator<GhostPigeon>();
+AppPigeon get authorizedClient =>
+    serviceLocator<AppPigeon>(instanceName: kAuthorizedPigeon);
+AppPigeon get ghostClient =>
+    serviceLocator<AppPigeon>(instanceName: kGhostPigeon);
+
+class ActivePigeonResolver {
+  ActivePigeonResolver({
+    required this.authorized,
+    required this.ghost,
+    AppPigeon? initial,
+  }) : _current = initial ?? ghost;
+
+  final AppPigeon authorized;
+  final AppPigeon ghost;
+  AppPigeon _current;
+
+  AppPigeon get current => _current;
+  bool get isGhost => identical(_current, ghost);
+  bool get isAuthorized => identical(_current, authorized);
+
+  void useAuthorized() => _current = authorized;
+  void useGhost() => _current = ghost;
+}
 
 Future<void> setupServiceLocator() async{
-  final AuthorizedAppPigeon authorizedPigeon = AuthorizedAppPigeon(
+  if (serviceLocator.isRegistered<AuthRepository>()) {
+    return;
+  }
+
+  final authorized = AuthorizedPigeon(
     MyRefreshTokenManager(),
     baseUrl: ApiEndpoints.baseUrl,
   );
+  final ghost = GhostPigeon(baseUrl: ApiEndpoints.baseUrl);
 
-  final GhostAppPigeon ghostPigeon = GhostAppPigeon(
-    baseUrl: ApiEndpoints.baseUrl
+  serviceLocator.registerSingleton<AuthorizedPigeon>(authorized);
+  serviceLocator.registerSingleton<GhostPigeon>(ghost);
+
+  // Named interface registrations to support dual-mode use cases.
+  serviceLocator.registerSingleton<AppPigeon>(
+    authorized,
+    instanceName: kAuthorizedPigeon,
+  );
+  serviceLocator.registerSingleton<AppPigeon>(
+    ghost,
+    instanceName: kGhostPigeon,
+  );
+  serviceLocator.registerSingleton<ActivePigeonResolver>(
+    ActivePigeonResolver(
+      authorized: authorized,
+      ghost: ghost,
+    ),
   );
 
-  serviceLocator.registerSingleton<AppPigeon>(authorizedPigeon);
-  serviceLocator.registerSingleton<GhostAppPigeon>(ghostPigeon);
-  serviceLocator.registerSingleton<AuthRepository>(AuthRepoImpl(authorizedPigeon));
-  serviceLocator.registerSingleton<ChatRepository>(ChatRepoImpl(authorizedPigeon));
-  serviceLocator.registerSingleton<ProfileRepository>(ProfileRepoImpl(authorizedPigeon));
+  // Backward compatibility for existing modules currently assuming authorized client.
+  serviceLocator.registerSingleton<AppPigeon>(authorized);
+  serviceLocator.registerSingleton<AuthRepository>(AuthRepoImpl(authorized));
+  serviceLocator.registerSingleton<ChatRepository>(
+    ChatRepoImpl(() => serviceLocator<ActivePigeonResolver>().current),
+  );
+  serviceLocator.registerSingleton<ProfileRepository>(ProfileRepoImpl(authorized));
 
 }
