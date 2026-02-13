@@ -19,20 +19,15 @@ mixin class ErrorHandler {
       error = ErrorResponse(
         message: "Server error!",
         exception: e,
-        stackTrace: s
+        stackTrace: s,
       );
     } on NoDataException catch (e, s) {
+      error = ErrorResponse(message: "No data!", exception: e, stackTrace: s);
+    } on SocketException catch (e, s) {
       error = ErrorResponse(
-        message: "No data!",
         exception: e,
-        stackTrace: s
-      );
-    } on SocketException catch(e, s) {
-      error =
-        ErrorResponse(
-          exception: e,
-          message: 'Internet connection failed!',
-          stackTrace: s
+        message: 'Internet connection failed!',
+        stackTrace: s,
       );
     } on DioException catch (e, s) {
       debugPrint(e.response?.toString());
@@ -40,11 +35,10 @@ mixin class ErrorHandler {
       debugPrint(e.stackTrace.toString());
       switch (e.type) {
         case DioExceptionType.connectionTimeout:
-          error =
-            ErrorResponse(
-              exception: e,
-              message: 'Connection timeout! Make sure internet is connected!',
-              stackTrace: s
+          error = ErrorResponse(
+            exception: e,
+            message: 'Connection timeout! Make sure internet is connected!',
+            stackTrace: s,
           );
         case DioExceptionType.receiveTimeout:
           error = ErrorResponse(
@@ -71,7 +65,7 @@ mixin class ErrorHandler {
             stackTrace: s,
           );
       }
-    } 
+    }
 
     debugPrint(error.toString());
     debugPrint(error.stackTrace.toString());
@@ -106,10 +100,15 @@ mixin class ErrorHandler {
     return response.data["data"];
   }
 
-  String? extractSuccessMessage(Response<dynamic> response, {Debugger? debugger}){
+  String? extractSuccessMessage(
+    Response<dynamic> response, {
+    Debugger? debugger,
+  }) {
     debugger?.dekhao(response);
     try {
-      return (response.data["success"] as bool) == true ? response.data["message"] as String : null;
+      return (response.data["success"] as bool) == true
+          ? response.data["message"] as String
+          : null;
     } catch (e) {
       debugger?.dekhao("Error from parsing success message: $e");
       return null;

@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../../common/widget/debouncer_button.dart';
 import '../../../constants/app_colors.dart';
@@ -6,27 +5,30 @@ import '../../../constants/app_sizes.dart';
 import '../process_notifier.dart';
 
 class RProcessNotifierButton extends StatefulWidget {
-
   final double? height;
   final double? width;
   final BorderRadius? borderRadius;
   final TextStyle? style;
   final ProcessStatusNotifier? processStatusNotifier;
   final Color? progressIndicatorColor;
+
   /// This text is displayed when the button is in either enabled or disabled state.
-  /// 
+  ///
   /// By default, it is set to "Save".
   final String generalText;
+
   /// This text is displayed when the button is in loading state.
-  /// 
+  ///
   /// By default, it is set to "Saving".
   final String loadingText;
+
   /// This text is displayed when the button is in error state.
-  /// 
+  ///
   /// By default, it is set to "Error".
   final String errorText;
+
   /// This text is displayed when the button is in done state.
-  /// 
+  ///
   /// By default, it is set to "Done".
   final String doneText;
   final Function(ProcessStatusNotifier processNotifier) onSave;
@@ -57,15 +59,16 @@ class _RProcessNotifierButtonState extends State<RProcessNotifierButton> {
   @override
   void initState() {
     // TODO: implement initState
-    buttonStatusNotifier = widget.processStatusNotifier ?? ProcessStatusNotifier();
+    buttonStatusNotifier =
+        widget.processStatusNotifier ?? ProcessStatusNotifier();
     buttonStatusNotifier.addListener(_update);
     super.initState();
   }
 
   @override
-  dispose(){
+  dispose() {
     buttonStatusNotifier.removeListener(_update);
-    if(widget.processStatusNotifier == null) buttonStatusNotifier.dispose();
+    if (widget.processStatusNotifier == null) buttonStatusNotifier.dispose();
     super.dispose();
   }
 
@@ -91,19 +94,21 @@ class _RProcessNotifierButtonState extends State<RProcessNotifierButton> {
       builder: (context, constraints) {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 350),
-          constraints: BoxConstraints(maxHeight: 52, maxWidth: constraints.maxWidth),
+          constraints: BoxConstraints(
+            maxHeight: 52,
+            maxWidth: constraints.maxWidth,
+          ),
           decoration: BoxDecoration(
             color:
-                (buttonStatusNotifier.status is ProcessDisabled || buttonStatusNotifier.status is ProcessLoading)
-                    ? AppColors.context(context).inActiveButtonColor
-                    : AppColors.context(context).buttonColor,
-            borderRadius: widget.borderRadius ??
-                AppSizes.rectangleButtonRadius,
+                (buttonStatusNotifier.status is ProcessDisabled ||
+                    buttonStatusNotifier.status is ProcessLoading)
+                ? AppColors.context(context).inActiveButtonColor
+                : AppColors.context(context).buttonColor,
+            borderRadius: widget.borderRadius ?? AppSizes.rectangleButtonRadius,
           ),
           child: DebouncerButton(
-            borderRadius: widget.borderRadius ??
-                AppSizes.rectangleButtonRadius,
-            onTap: () async{
+            borderRadius: widget.borderRadius ?? AppSizes.rectangleButtonRadius,
+            onTap: () async {
               if (buttonStatusNotifier.status is ProcessEnabled) {
                 widget.onSave(buttonStatusNotifier);
               }
@@ -125,21 +130,27 @@ class _RProcessNotifierButtonState extends State<RProcessNotifierButton> {
           case const (ProcessEnabled):
             return Text(
               widget.generalText,
-              style: widget.style ?? TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.context(context).buttonContentColor,
-              ),
+              style:
+                  widget.style ??
+                  TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.context(context).buttonContentColor,
+                  ),
             );
 
           case const (ProcessDisabled):
             return Text(
               widget.generalText,
-              style: widget.style ?? TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: AppColors.context(context).inActiveButtonContentColor,
-              ),
+              style:
+                  widget.style ??
+                  TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: AppColors.context(
+                      context,
+                    ).inActiveButtonContentColor,
+                  ),
             );
 
           case const (ProcessLoading):
@@ -149,17 +160,22 @@ class _RProcessNotifierButtonState extends State<RProcessNotifierButton> {
                 SizedBox(width: 10),
                 Text(
                   widget.loadingText,
-                  style: widget.style ?? TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.context(context).buttonContentColor,
-                  ),
+                  style:
+                      widget.style ??
+                      TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.context(context).buttonContentColor,
+                      ),
                 ),
                 SizedBox(width: 10),
                 SizedBox(
                   height: 16,
                   width: 16,
-                  child: CircularProgressIndicator(strokeWidth: 4, color: widget.progressIndicatorColor ?? Colors.white),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 4,
+                    color: widget.progressIndicatorColor ?? Colors.white,
+                  ),
                 ),
               ],
             );
@@ -176,11 +192,13 @@ class _RProcessNotifierButtonState extends State<RProcessNotifierButton> {
                 SizedBox(width: 10),
                 Text(
                   widget.errorText,
-                  style: widget.style ?? TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.context(context).buttonContentColor,
-                  ),
+                  style:
+                      widget.style ??
+                      TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.context(context).buttonContentColor,
+                      ),
                 ),
               ],
             );
@@ -197,11 +215,13 @@ class _RProcessNotifierButtonState extends State<RProcessNotifierButton> {
                 SizedBox(width: 10),
                 Text(
                   widget.doneText,
-                  style: widget.style ?? TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                    color: AppColors.context(context).buttonContentColor,
-                  ),
+                  style:
+                      widget.style ??
+                      TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.context(context).buttonContentColor,
+                      ),
                 ),
               ],
             );

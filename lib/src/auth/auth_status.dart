@@ -26,7 +26,7 @@ class UnAuthenticated extends AuthStatus {
   }
 }
 
-class AuthLoading extends AuthStatus{
+class AuthLoading extends AuthStatus {
   @override
   bool operator ==(Object other) {
     return other is AuthLoading;
@@ -49,13 +49,14 @@ class Authenticated extends AuthStatus {
   //   token: auth._accessToken ?? '',
   //   userId: auth.userId,
   // );
-  
+
   Authenticated({required this.auth});
 
   @override
   String toString() {
     return 'Authenticated(auth: $auth)';
   }
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -67,7 +68,6 @@ class Authenticated extends AuthStatus {
   int get hashCode => auth.hashCode;
 }
 
-
 class AuthError extends AuthStatus {
   final String error;
   AuthError({required this.error});
@@ -76,7 +76,7 @@ class AuthError extends AuthStatus {
   String toString() {
     return 'AuthError(error: $error)';
   }
-  
+
   @override
   bool operator ==(Object other) {
     if (identical(this, other)) return true;
@@ -87,4 +87,3 @@ class AuthError extends AuthStatus {
   @override
   int get hashCode => error.hashCode;
 }
-

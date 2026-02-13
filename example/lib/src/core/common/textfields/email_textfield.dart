@@ -1,15 +1,12 @@
-
 import 'package:flutter/material.dart';
 
 import '../../constants/assets.dart';
 import 'textfield_prefix_icon.dart';
 
-
-
 class EmailTextfield extends StatefulWidget {
   final String initialText;
-  final Function (String text) onChanged;
-  final String? Function (String text) validationCheck;
+  final Function(String text) onChanged;
+  final String? Function(String text) validationCheck;
   final String hintText;
   final String labelText;
   final int? maxLines;
@@ -22,8 +19,8 @@ class EmailTextfield extends StatefulWidget {
     this.initialText = "",
     required this.validationCheck,
     this.showPrefixIcon = true,
-    super.key
-    });
+    super.key,
+  });
 
   @override
   State<EmailTextfield> createState() => _EmailTextfieldState();
@@ -31,7 +28,7 @@ class EmailTextfield extends StatefulWidget {
 
 class _EmailTextfieldState extends State<EmailTextfield> {
   final TextEditingController _controller = TextEditingController();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState> ();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   final FocusNode _focusNode = FocusNode();
 
@@ -52,7 +49,6 @@ class _EmailTextfieldState extends State<EmailTextfield> {
 
   @override
   Widget build(BuildContext context) {
-    
     return LayoutBuilder(
       builder: (context, constraints) => Form(
         key: _formKey,
@@ -60,7 +56,7 @@ class _EmailTextfieldState extends State<EmailTextfield> {
           onTap: () {
             _focusNode.requestFocus();
           },
-          onTapOutside: (event){
+          onTapOutside: (event) {
             _focusNode.unfocus();
           },
           focusNode: _focusNode,
@@ -73,9 +69,11 @@ class _EmailTextfieldState extends State<EmailTextfield> {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             hintText: widget.hintText,
             labelText: widget.labelText,
-            prefixIcon: widget.showPrefixIcon ? TextfieldPrefixIcon(assetName: Assets.email) : null,
+            prefixIcon: widget.showPrefixIcon
+                ? TextfieldPrefixIcon(assetName: Assets.email)
+                : null,
           ),
-          
+
           onChanged: (value) {
             widget.onChanged(value);
             _formKey.currentState!.validate();

@@ -8,8 +8,7 @@ import '../model/login_request.dart';
 import '../model/reset_password_request.dart';
 import '../model/signup_request.dart';
 
-abstract class AuthRepository with ErrorHandler{
-
+abstract class AuthRepository with ErrorHandler {
   AsyncRequest<void> login(LoginRequest request);
   AsyncRequest<void> signup(SignupRequest request);
   Stream<AuthenticatedUser?> get authStream;
@@ -47,7 +46,9 @@ class AuthRepositoryStub extends AuthRepository {
   }
 
   @override
-  Future<ApiResponse<void>> forgotPassword(ForgetPasswordRequest request) async {
+  Future<ApiResponse<void>> forgotPassword(
+    ForgetPasswordRequest request,
+  ) async {
     return _notImplemented('Forgot password');
   }
 
@@ -57,10 +58,12 @@ class AuthRepositoryStub extends AuthRepository {
   }
 
   @override
-  Future<ApiResponse<void>> verifyEmail(EmailVerificationRequest request) async {
+  Future<ApiResponse<void>> verifyEmail(
+    EmailVerificationRequest request,
+  ) async {
     return _notImplemented('Email verification');
   }
-  
+
   @override
   Future<ApiResponse<List<Auth>>> fetchAllAccounts() async {
     return _notImplemented('Fetch accounts');
@@ -70,7 +73,7 @@ class AuthRepositoryStub extends AuthRepository {
   Future<ApiResponse<void>> switchAccount({required String uid}) async {
     return _notImplemented('Switch account');
   }
-  
+
   @override
   // TODO: implement authStream
   Stream<AuthenticatedUser?> get authStream => throw UnimplementedError();

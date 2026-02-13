@@ -1,4 +1,3 @@
-
 part of 'themes.dart';
 
 class DAppBarTheme {
@@ -8,24 +7,23 @@ class DAppBarTheme {
   static AppBarTheme lightAppBarTheme = AppBarTheme(
     backgroundColor: AppColors.light().backgroundColor,
     //foregroundColor: AppColors.light().primaryColor,
-    surfaceTintColor: AppColors.light().backgroundColor,//AppColors.light().backgroundColor,
+    surfaceTintColor:
+        AppColors.light().backgroundColor, //AppColors.light().backgroundColor,
     systemOverlayStyle: SystemUiOverlayStyle(
       statusBarBrightness: Brightness.light,
       statusBarColor: AppColors.light().backgroundColor,
-      statusBarIconBrightness: Brightness.light
+      statusBarIconBrightness: Brightness.light,
     ),
+
     //elevation: 0,
     //titleSpacing: 0,
-    
-    iconTheme: IconThemeData(
+    iconTheme: IconThemeData(color: AppColors.light().textColor, size: 18),
+    actionsIconTheme: IconThemeData(
       color: AppColors.light().textColor,
-      size: 18  
+      size: 18,
     ),
-    actionsIconTheme: IconThemeData(color: AppColors.light().textColor, size: 18),
     toolbarTextStyle: TextStyle(color: AppColors.light().textColor),
-    titleTextStyle: TextStyle(
-      color: AppColors.light().textColor,
-    ).w600.regular,
+    titleTextStyle: TextStyle(color: AppColors.light().textColor).w600.regular,
     centerTitle: true,
   );
 
@@ -36,11 +34,14 @@ class DAppBarTheme {
     systemOverlayStyle: SystemUiOverlayStyle(
       statusBarBrightness: Brightness.dark,
       statusBarColor: AppColors.light().backgroundColor,
-      statusBarIconBrightness: Brightness.dark
+      statusBarIconBrightness: Brightness.dark,
     ),
     elevation: 0,
     iconTheme: IconThemeData(color: AppColors.dark().textColor, size: 18),
-    actionsIconTheme: IconThemeData(color: AppColors.dark().iconColor, size: 18),
+    actionsIconTheme: IconThemeData(
+      color: AppColors.dark().iconColor,
+      size: 18,
+    ),
     toolbarTextStyle: TextStyle(color: AppColors.dark().textColor),
     titleTextStyle: TextStyle(
       color: AppColors.dark().invertTextColor,

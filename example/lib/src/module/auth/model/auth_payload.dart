@@ -13,9 +13,10 @@ class AuthPayload {
 
   factory AuthPayload.fromJson(Map<String, dynamic> json) {
     final rawData = json['data'];
-    final dataMap = rawData is Map<String, dynamic>
-        ? Map<String, dynamic>.from(rawData)
-        : Map<String, dynamic>.from(json)
+    final dataMap =
+        rawData is Map<String, dynamic>
+              ? Map<String, dynamic>.from(rawData)
+              : Map<String, dynamic>.from(json)
           ..remove('access_token')
           ..remove('accessToken')
           ..remove('refresh_token')

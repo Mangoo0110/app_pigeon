@@ -1,4 +1,5 @@
 part of 'themes.dart';
+
 class ProgressIndicatorThemes {
   static ProgressIndicatorThemeData light = ProgressIndicatorThemeData(
     color: Colors.black,

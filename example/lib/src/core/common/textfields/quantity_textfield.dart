@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 class QuantityTextField extends StatefulWidget {
   final TextEditingController controller;
-  final Function (String text) onChanged;
-  final Function (String text) validationCheck;
+  final Function(String text) onChanged;
+  final Function(String text) validationCheck;
   final String hintText;
   final String labelText;
   final int? maxLines;
@@ -19,8 +19,8 @@ class QuantityTextField extends StatefulWidget {
     required this.validationCheck,
     required this.onlyInteger,
     required this.numRegExp,
-    super.key
-    });
+    super.key,
+  });
 
   @override
   State<QuantityTextField> createState() => _QuantityTextFieldState();
@@ -31,24 +31,21 @@ class _QuantityTextFieldState extends State<QuantityTextField> {
 
   @override
   Widget build(BuildContext context) {
-
     return LayoutBuilder(
       builder: (context, constraints) => TextFormField(
         //autofocus: true,
         onTap: () {
           _focusNode.requestFocus();
-          setState(() {
-            
-          });
+          setState(() {});
         },
-        onTapOutside: (event){
+        onTapOutside: (event) {
           _focusNode.unfocus();
           setState(() {
-            if(widget.controller.text == '') {
+            if (widget.controller.text == '') {
               widget.controller.text = '0';
             }
           });
-        },        
+        },
         focusNode: _focusNode,
         maxLines: widget.maxLines,
         controller: widget.controller,
@@ -61,20 +58,16 @@ class _QuantityTextFieldState extends State<QuantityTextField> {
           labelStyle: Theme.of(context).textTheme.titleMedium,
           hintStyle: const TextStyle(color: Colors.grey),
           border: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.black38,
-            ),
+            borderSide: BorderSide(color: Colors.black38),
           ),
           focusedBorder: const OutlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.green,
-            ),
-          )
+            borderSide: BorderSide(color: Colors.green),
+          ),
         ),
-        keyboardType: TextInputType.numberWithOptions(decimal: !widget.onlyInteger),
-        inputFormatters: [
-          FilteringTextInputFormatter.allow(widget.numRegExp),
-        ],
+        keyboardType: TextInputType.numberWithOptions(
+          decimal: !widget.onlyInteger,
+        ),
+        inputFormatters: [FilteringTextInputFormatter.allow(widget.numRegExp)],
         onChanged: (value) {
           widget.onChanged(value);
         },

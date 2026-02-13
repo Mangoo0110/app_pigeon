@@ -19,10 +19,7 @@ class AuthHomeScreen extends StatelessWidget {
         final resolved = _resolveStatus(user);
         return Navigator(
           pages: [
-            MaterialPage(
-              key: ValueKey(resolved.key),
-              child: resolved.screen,
-            ),
+            MaterialPage(key: ValueKey(resolved.key), child: resolved.screen),
           ],
           onDidRemovePage: (_) {},
         );
@@ -32,10 +29,7 @@ class AuthHomeScreen extends StatelessWidget {
 
   _ResolvedScreen _resolveStatus(AuthenticatedUser? user) {
     if (user == null) {
-      return const _ResolvedScreen(
-        key: 'login',
-        screen: LoginScreen(),
-      );
+      return const _ResolvedScreen(key: 'login', screen: LoginScreen());
     }
 
     if (user.isVerified) {
@@ -47,19 +41,13 @@ class AuthHomeScreen extends StatelessWidget {
 
     return _ResolvedScreen(
       key: 'verify',
-      screen: EmailVerificationScreen(
-        userId: user.uid,
-        showBack: false,
-      ),
+      screen: EmailVerificationScreen(userId: user.uid, showBack: false),
     );
   }
 }
 
 class _ResolvedScreen {
-  const _ResolvedScreen({
-    required this.key,
-    required this.screen,
-  });
+  const _ResolvedScreen({required this.key, required this.screen});
 
   final String key;
   final Widget screen;

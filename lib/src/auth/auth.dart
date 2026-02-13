@@ -1,22 +1,20 @@
 part of '../authorized_pigeon.dart';
 
-base class Auth{
-
+base class Auth {
   Auth._internal({
     required String? accessToken,
     required String? refreshToken,
     required this.data,
-  }): _accessToken = accessToken, _refreshToken = refreshToken;
-
+  })  : _accessToken = accessToken,
+        _refreshToken = refreshToken;
 
   final String? _accessToken;
   final String? _refreshToken;
   final Map<String, dynamic> data;
   // static final Debugger _debugger = AuthServiceDebugger();
 
-  
   bool get isVerified => _accessToken != null && _refreshToken != null;
-  
+
   // Auth copyWith({
   //   String? accessToken,
   //   String? refreshToken,
@@ -44,7 +42,6 @@ base class Auth{
     } catch (e) {
       return null;
     }
-    
   }
 
   Map<String, dynamic> toJson() {
@@ -73,6 +70,3 @@ base class Auth{
   @override
   int get hashCode => Object.hash(_accessToken, _refreshToken, data);
 }
-
-
-

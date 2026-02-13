@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../../../main.dart';
 import '../../module/auth/model/authenticated_user.dart';
@@ -11,10 +10,17 @@ class AppRouter {
   // static Future<void> navigateTo(RouteNames routeName) async {
   //   await navigatorKey.currentState?.pushNamed(routeName.name);
   // }
-  static Future<void> navigateToReplacement(RouteNames routeName, [Object? arguments]) async {
-    debugPrint('navigateToReplacement: ${routeName.name}, ${navigatorKey.currentState}');
-    await navigatorKey.currentState
-        ?.pushReplacementNamed(routeName.path, arguments: arguments);
+  static Future<void> navigateToReplacement(
+    RouteNames routeName, [
+    Object? arguments,
+  ]) async {
+    debugPrint(
+      'navigateToReplacement: ${routeName.name}, ${navigatorKey.currentState}',
+    );
+    await navigatorKey.currentState?.pushReplacementNamed(
+      routeName.path,
+      arguments: arguments,
+    );
   }
 
   // static Future<void> navigateBack() async {
@@ -57,10 +63,6 @@ class AppRouter {
     return null;
   }
 }
-
-
-
-
 
 // import 'package:class_photo_sicesloposwa/src/core/di/repo_di.dart';
 // import 'package:class_photo_sicesloposwa/src/module/auth/repo/auth_repo.dart';

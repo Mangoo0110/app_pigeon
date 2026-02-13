@@ -18,9 +18,9 @@ part 'auth/auth_storage.dart';
 part 'params/auth_params.dart';
 part 'network/api_call_interceptor.dart';
 
-
-
-class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorization {
+class AuthorizedPigeon
+    with PigeonErrorHandler
+    implements AppPigeon, Authorization {
   AuthorizedPigeon(
     this.refreshTokenManager, {
     int connectTimeout = 15000, // milliseconds
@@ -39,9 +39,13 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
     _dio.options.connectTimeout = Duration(milliseconds: connectTimeout);
     _dio.options.receiveTimeout = Duration(milliseconds: receiveTimeout);
     // Initialize and add interceptor
-    _apiCallInterceptor = ApiCallInterceptor(_authStorage, _dio, refreshTokenManager);
+    _apiCallInterceptor =
+        ApiCallInterceptor(_authStorage, _dio, refreshTokenManager);
     _dio.interceptors.add(_apiCallInterceptor);
-    _init(connectTimeout: connectTimeout, receiveTimeout: receiveTimeout, onError: onError);
+    _init(
+        connectTimeout: connectTimeout,
+        receiveTimeout: receiveTimeout,
+        onError: onError);
   }
 
   final Dio _dio = Dio();
@@ -61,7 +65,7 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
     await runGuarded(
       () async {
         debugPrint("Initializing AppPigeon");
-        
+
         // Initialize auth storage
         debugPrint("Calling init() on AuthStorage");
         _authStorage.init();
@@ -70,7 +74,6 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
       rethrowError: false,
     );
   }
-  
 
   @override
   void dispose() {
@@ -142,9 +145,10 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
 
   /// ### POST
   @override
-  Future<Response> post(String path, {
-    dynamic data, 
-    Options? options,  
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Options? options,
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
@@ -163,9 +167,10 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
 
   /// ### PUT
   @override
-  Future<Response> put(String path, {
-    dynamic data, 
-    Options? options,  
+  Future<Response> put(
+    String path, {
+    dynamic data,
+    Options? options,
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
     ProgressCallback? onSendProgress,
@@ -182,7 +187,8 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
 
   /// ### PATCH
   @override
-  Future<Response> patch(String path, {
+  Future<Response> patch(
+    String path, {
     dynamic data,
     Options? options,
     Map<String, dynamic>? queryParameters,
@@ -220,14 +226,13 @@ class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorizati
   /// [param.token] is optional. If not provided, it will try to get the
   /// current auth token from the current auth record stored.
   /// If no current auth record is found, socket will not be initialized.
-  /// 
+  ///
   /// ### NOTE:: If you want to see debug logs from socket service,
   /// ### make sure to add [DebugLabel.socketService] to the [allowOnly] set, while setting up your [AuthorizedPigeon]
   @override
   Future<void> socketInit(SocketConnetParamX param) async {
     final token =
-        param.token ??
-        (await _authStorage.getCurrentAuth())?._accessToken;
+        param.token ?? (await _authStorage.getCurrentAuth())?._accessToken;
     final socketConnectParam = SocketConnectParam(
       url: param.socketUrl,
       token: token,

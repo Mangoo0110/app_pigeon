@@ -22,10 +22,8 @@ class DatePickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if(selectedDate != null) _currentDate  = selectedDate!;
-    _controller.text = selectedDate != null
-        ? _formateDate(selectedDate!)
-        : '';
+    if (selectedDate != null) _currentDate = selectedDate!;
+    _controller.text = selectedDate != null ? _formateDate(selectedDate!) : '';
     return GestureDetector(
       onTap: () async {
         final now = DateTime.now();
@@ -45,11 +43,20 @@ class DatePickerField extends StatelessWidget {
         child: TextFormField(
           decoration: InputDecoration(
             hintText: label,
-            suffixIcon: const Icon(Icons.calendar_today, color: Color.from(alpha: 1, red: 0.451, green: 0.451, blue: 0.451),),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+            suffixIcon: const Icon(
+              Icons.calendar_today,
+              color: Color.from(
+                alpha: 1,
+                red: 0.451,
+                green: 0.451,
+                blue: 0.451,
+              ),
             ),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
+            ),
           ),
           controller: _controller,
         ),

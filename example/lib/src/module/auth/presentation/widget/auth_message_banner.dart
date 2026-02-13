@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
 
 class AuthMessageBanner extends StatelessWidget {
-  const AuthMessageBanner({
-    required this.message,
-    this.color,
-    super.key,
-  });
+  const AuthMessageBanner({required this.message, this.color, super.key});
 
   final String? message;
   final Color? color;
@@ -23,10 +19,7 @@ class AuthMessageBanner extends StatelessWidget {
         color: color ?? theme.colorScheme.surfaceVariant,
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Text(
-        message!,
-        style: theme.textTheme.bodyMedium,
-      ),
+      child: Text(message!, style: theme.textTheme.bodyMedium),
     );
   }
 }

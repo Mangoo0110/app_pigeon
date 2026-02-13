@@ -17,10 +17,7 @@ import '../../module/profile/presentation/widget/profile_avatar_action.dart';
 import '../../module/profile/repo/profile_repository.dart';
 
 class AuthenticatedHomeScreen extends StatefulWidget {
-  const AuthenticatedHomeScreen({
-    super.key,
-    required this.currentAuth,
-  });
+  const AuthenticatedHomeScreen({super.key, required this.currentAuth});
 
   final AuthenticatedUser currentAuth;
 
@@ -104,8 +101,12 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
   }
 
   Future<void> _switchAccount(Auth auth) async {
-    final uid =
-        _firstNonEmptyString(auth.data, ["uid", "user_id", "userId", "id"]);
+    final uid = _firstNonEmptyString(auth.data, [
+      "uid",
+      "user_id",
+      "userId",
+      "id",
+    ]);
     if (uid == null || uid.isEmpty) return;
     final res = await serviceLocator<AuthRepository>().switchAccount(uid: uid);
     if (res is ErrorResponse<void>) return;
@@ -173,10 +174,7 @@ class _AuthenticatedHomeScreenState extends State<AuthenticatedHomeScreen> {
                   icon: const Icon(Icons.refresh),
                   onPressed: _loadDashboard,
                 ),
-                ProfileAvatarAction(
-                  label: name,
-                  onTap: _openProfileSheet,
-                ),
+                ProfileAvatarAction(label: name, onTap: _openProfileSheet),
               ],
       ),
       body: SafeArea(

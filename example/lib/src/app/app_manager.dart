@@ -1,4 +1,3 @@
-
 import 'package:app_pigeon/app_pigeon.dart';
 import 'package:example/src/module/auth/repo/auth_repository.dart';
 import 'package:flutter/cupertino.dart';
@@ -10,6 +9,7 @@ import 'routing/route_names.dart';
 
 class AppManager {
   static final AppManager _instance = AppManager._internal();
+
   /// Singleton
   factory AppManager() => _instance;
   AppManager._internal();
@@ -24,15 +24,13 @@ class AppManager {
   ActivePigeonResolver get _activePigeonResolver =>
       serviceLocator<ActivePigeonResolver>();
 
-  void initialize() async{
+  void initialize() async {
     //  currentAuth.value = await serviceLocator<AuthRepo>().currentUser();
     //  _onAuthChange(currentAuth.value);
     // Initialization code here
     serviceLocator<AuthRepository>().authStream.listen(
       _onAuthChange,
-      onError: (e)=> {
-        debugPrint(e.toString()),
-      }
+      onError: (e) => {debugPrint(e.toString())},
     );
   }
 
@@ -56,7 +54,5 @@ class AppManager {
     }
   }
 
-  void _initializeGlobalDataProviders() {
-
-  }
+  void _initializeGlobalDataProviders() {}
 }

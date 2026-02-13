@@ -19,4 +19,3 @@ mixin class PigeonErrorHandler {
     }
   }
 }
-

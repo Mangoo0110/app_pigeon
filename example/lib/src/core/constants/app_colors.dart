@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-
 class AppColors {
-
-  static final Color _primaryColor =Color(0xFF6666FF);//Color.fromARGB(255, 58, 64, 234);
+  static final Color _primaryColor = Color(
+    0xFF6666FF,
+  ); //Color.fromARGB(255, 58, 64, 234);
   //static const Color _actionColor =  Colors.orange;
   static final AppColors _lightInstance = AppColors._internalLight();
   static final AppColors _darkInstance = AppColors._internalDark();
@@ -17,9 +17,9 @@ class AppColors {
   }
 
   /// Returns the correct [AppColors] instance based on the [ThemeData.brightness]
-  /// 
+  ///
   /// .
-  /// 
+  ///
   /// .
   ///#### [Note]
   ///
@@ -68,10 +68,25 @@ class AppColors {
   final Color buttonColor = _primaryColor;
   final Color drawerColor;
   final Color fillColor = Colors.transparent;
-  final Color hintColor = Color.from(alpha: 1, red: 0.451, green: 0.451, blue: 0.451);
-  final Color labelColor = Color.from(alpha: 1, red: 0.451, green: 0.451, blue: 0.451);
+  final Color hintColor = Color.from(
+    alpha: 1,
+    red: 0.451,
+    green: 0.451,
+    blue: 0.451,
+  );
+  final Color labelColor = Color.from(
+    alpha: 1,
+    red: 0.451,
+    green: 0.451,
+    blue: 0.451,
+  );
   final Color focusedBorderColor = _primaryColor;
-  final Color enabledBorderColor = Color.from(alpha: 1, red: 0.749, green: 0.749, blue: 0.749);
+  final Color enabledBorderColor = Color.from(
+    alpha: 1,
+    red: 0.749,
+    green: 0.749,
+    blue: 0.749,
+  );
   final Color borderColor;
   final Color popupBackgroundColor;
   final Color popupContentColor;
@@ -105,7 +120,7 @@ class AppColors {
     : textColor = Colors.white,
       invertTextColor = Colors.black,
       grey = Colors.grey,
-      backgroundColor = Color.fromARGB(255, 17, 22, 31),//Colors.black,
+      backgroundColor = Color.fromARGB(255, 17, 22, 31), //Colors.black,
       tileColor = Colors.grey.shade900,
       softGrey = Colors.grey.shade500,
       iconColor = Color(0xFF0F0F79),
@@ -121,6 +136,4 @@ class AppColors {
       popupContentColor = Colors.white,
       shadowColor = const Color.fromARGB(146, 124, 123, 123),
       tabBarColor = Colors.black;
-
-  
 }

@@ -3,7 +3,11 @@ abstract class ApiResponse<T> {
   final String message;
   final T? data;
 
-  ApiResponse({required this.success, required this.message, required this.data});
+  ApiResponse({
+    required this.success,
+    required this.message,
+    required this.data,
+  });
 
   @override
   String toString() {
@@ -12,7 +16,8 @@ abstract class ApiResponse<T> {
 }
 
 class SuccessResponse<T> extends ApiResponse<T> {
-  SuccessResponse({super.message = "Success!", required super.data}): super(success: true);
+  SuccessResponse({super.message = "Success!", required super.data})
+    : super(success: true);
 }
 
 class ErrorResponse<T> extends ApiResponse<T> {

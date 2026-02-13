@@ -13,7 +13,8 @@ class AuthTextField extends StatelessWidget {
     this.textInputAction,
     this.inputFormatters,
     this.textCapitalization = TextCapitalization.none,
-    super.key, required this.onChanged,
+    super.key,
+    required this.onChanged,
   });
 
   final TextEditingController controller;

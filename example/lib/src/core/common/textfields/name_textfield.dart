@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 import '../../constants/app_colors.dart';
@@ -8,9 +7,9 @@ class NameTextfield extends StatefulWidget {
   final String initialText;
   final Widget? prefiexIcon;
   final Widget? suffixIcon;
-  final Function (String text) onChanged;
+  final Function(String text) onChanged;
   final Color? fillColor;
-  final String? Function (String text) validationCheck;
+  final String? Function(String text) validationCheck;
   final String hintText;
   final String labelText;
   final int? maxLines;
@@ -27,8 +26,8 @@ class NameTextfield extends StatefulWidget {
     required this.validationCheck,
     this.fillColor,
     this.autofocus = false,
-    super.key
-    });
+    super.key,
+  });
 
   @override
   State<NameTextfield> createState() => _NameTextfieldState();
@@ -45,7 +44,7 @@ class _NameTextfieldState extends State<NameTextfield> {
     // TODO: implement initState
     _controller.text = widget.initialText;
     super.initState();
-    if(widget.autofocus){
+    if (widget.autofocus) {
       _focusNode.requestFocus();
     }
   }
@@ -59,12 +58,13 @@ class _NameTextfieldState extends State<NameTextfield> {
     _controller.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => TextFormField(
         cursorColor: AppColors.light().primaryColor,
-        onTapOutside: (event){
+        onTapOutside: (event) {
           _focusNode.unfocus();
         },
         focusNode: _focusNode,

@@ -25,10 +25,7 @@ import 'forgot_password_screen.dart';
 import 'signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({
-    this.showBack = false,
-    super.key,
-  });
+  const LoginScreen({this.showBack = false, super.key});
 
   final bool showBack;
 
@@ -38,8 +35,9 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final LoginFormState _form = LoginFormState();
-  final ProcessStatusNotifier processStatusNotifier =
-      ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: ProcessEnabled(message: ''),
+  );
   late final SnackbarNotifier snackbarNotifier;
   List<Auth> _accounts = const <Auth>[];
   bool _loadingAccounts = true;
@@ -63,7 +61,10 @@ class _LoginScreenState extends State<LoginScreen> {
     }
     await handleFutureRequest(
       futureRequest: () => serviceLocator<AuthRepository>().login(
-        LoginRequest(email: _form.emailController.text, password: _form.passwordController.text),
+        LoginRequest(
+          email: _form.emailController.text,
+          password: _form.passwordController.text,
+        ),
       ),
       debugger: AuthDebugger(),
       processStatusNotifier: processStatusNotifier,
@@ -306,7 +307,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 FilledButton(
                   onPressed: () {
                     final value = usernameValue.trim().toLowerCase();
-                    final isValid = RegExp(r'^[a-z0-9_]{3,24}$').hasMatch(value);
+                    final isValid = RegExp(
+                      r'^[a-z0-9_]{3,24}$',
+                    ).hasMatch(value);
                     if (!isValid) {
                       setLocalState(() {
                         validationMessage = '3-24 chars: a-z, 0-9, _';
@@ -399,8 +402,7 @@ class _LoginScreenState extends State<LoginScreen> {
               errorText: 'Try again',
               doneText: 'Done',
               onSave: (_) => _submit(),
-              onDone: () =>
-                  processStatusNotifier.setEnabled(message: ''),
+              onDone: () => processStatusNotifier.setEnabled(message: ''),
             ),
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -431,11 +433,9 @@ class _LoginScreenState extends State<LoginScreen> {
             AuthLinkButton(
               label: 'Create an account',
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) => const SignupScreen(),
-                  ),
-                );
+                Navigator.of(
+                  context,
+                ).push(MaterialPageRoute(builder: (_) => const SignupScreen()));
               },
             ),
           ],

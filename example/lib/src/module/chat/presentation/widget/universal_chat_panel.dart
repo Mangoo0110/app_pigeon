@@ -37,7 +37,10 @@ class UniversalChatPanel extends StatelessWidget {
                       final message = messages[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Text("${message.sender.name}: ${message.text}", maxLines: 20,),
+                        child: Text(
+                          "${message.sender.name}: ${message.text}",
+                          maxLines: 20,
+                        ),
                       );
                     },
                   ),
@@ -57,10 +60,7 @@ class UniversalChatPanel extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            FilledButton(
-              onPressed: onSend,
-              child: const Text("Send"),
-            ),
+            FilledButton(onPressed: onSend, child: const Text("Send")),
           ],
         ),
       ],

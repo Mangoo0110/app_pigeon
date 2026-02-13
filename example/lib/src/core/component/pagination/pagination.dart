@@ -15,21 +15,33 @@ enum PaginationLoadState {
   loaded,
   allLoaded,
   nopages,
-  error
+  error,
 }
 
-class PaginationController<T> extends ChangeNotifier{
-  PaginationController(List<T> items, {required this.onRefresh, required this.onLoadMore, this.snackbarNotifier}): items = ValueNotifier(items);
-  
+class PaginationController<T> extends ChangeNotifier {
+  PaginationController(
+    List<T> items, {
+    required this.onRefresh,
+    required this.onLoadMore,
+    this.snackbarNotifier,
+  }) : items = ValueNotifier(items);
+
   final ValueNotifier<List<T>> items;
   final AsyncRequest<List<T>> Function({required String searchText}) onRefresh;
-  final AsyncRequest<List<T>> Function({required T? lastData, required int limit, required String searchText}) onLoadMore;
-  
+  final AsyncRequest<List<T>> Function({
+    required T? lastData,
+    required int limit,
+    required String searchText,
+  })
+  onLoadMore;
+
   final SnackbarNotifier? snackbarNotifier;
-  final ValueNotifier<PaginationLoadState> _state = ValueNotifier(PaginationLoadState.idle);
+  final ValueNotifier<PaginationLoadState> _state = ValueNotifier(
+    PaginationLoadState.idle,
+  );
   final ValueNotifier<String> searchText = ValueNotifier('');
 
-  ValueNotifier<PaginationLoadState>  get state => _state;
+  ValueNotifier<PaginationLoadState> get state => _state;
   final int firstPageVal = 1;
   final ValueNotifier<int> lastFetchedPage = ValueNotifier(0);
 
@@ -42,27 +54,28 @@ class PaginationController<T> extends ChangeNotifier{
     required AsyncRequest<List<T>> Function() futureRequest,
     bool refreshing = false,
     SnackbarNotifier? snackbarNotifier,
-  }) async{
-    if(state.value == PaginationLoadState.loading || state.value == PaginationLoadState.refreshing) {
+  }) async {
+    if (state.value == PaginationLoadState.loading ||
+        state.value == PaginationLoadState.refreshing) {
       return;
     }
 
-    debouncer.run(() async{
+    debouncer.run(() async {
       refreshing ? setRefresh() : setLoading();
-      if(refreshing) {
+      if (refreshing) {
         lastFetchedPage.value = firstPageVal - 1;
       }
       final res = await futureRequest();
-      if(res is SuccessResponse) {
+      if (res is SuccessResponse) {
         debugPrint("Data: ${res.data}");
-        if(res.data == null || res.data!.isEmpty) {
-          if(lastFetchedPage.value <= firstPageVal) {
+        if (res.data == null || res.data!.isEmpty) {
+          if (lastFetchedPage.value <= firstPageVal) {
             setNoPages();
             return;
           }
           setLastPageData(res.data!);
-        }else {
-          if(limit > res.data!.length) {
+        } else {
+          if (limit > res.data!.length) {
             debugPrint("Setting last page data");
             setLastPageData(res.data!);
           } else {
@@ -75,12 +88,14 @@ class PaginationController<T> extends ChangeNotifier{
       }
       _lastFetchTime = DateTime.now();
     });
-    
   }
 
   void search(String text) {
     searchText.value = text;
-    handleDataRequest(futureRequest: () => onRefresh(searchText: searchText.value), refreshing: true);
+    handleDataRequest(
+      futureRequest: () => onRefresh(searchText: searchText.value),
+      refreshing: true,
+    );
   }
 
   void setRefresh() {
@@ -93,7 +108,7 @@ class PaginationController<T> extends ChangeNotifier{
 
   setError({ErrorResponse? error}) {
     state.value = PaginationLoadState.error;
-    
+
     items.notifyListeners();
     notifyListeners();
   }
@@ -110,17 +125,21 @@ class PaginationController<T> extends ChangeNotifier{
     notifyListeners();
   }
 
-  
   bool _shouldTryLoadMore() {
-    if((state.value == PaginationLoadState.allLoaded || state.value == PaginationLoadState.nopages) && _lastFetchTime.difference(DateTime.now()).inMilliseconds.abs() < (1000 * 60 * 3.5)) {
-      debugPrint("Should not try to load more.. ${_lastFetchTime.difference(DateTime.now()).inMilliseconds.abs()}ms and state: ${state.value}");
+    if ((state.value == PaginationLoadState.allLoaded ||
+            state.value == PaginationLoadState.nopages) &&
+        _lastFetchTime.difference(DateTime.now()).inMilliseconds.abs() <
+            (1000 * 60 * 3.5)) {
+      debugPrint(
+        "Should not try to load more.. ${_lastFetchTime.difference(DateTime.now()).inMilliseconds.abs()}ms and state: ${state.value}",
+      );
       return false;
     }
     return true;
   }
 
-  Future<void> loadNextPage() async{
-    if(!_shouldTryLoadMore()) {
+  Future<void> loadNextPage() async {
+    if (!_shouldTryLoadMore()) {
       return;
     }
     debugPrint("Next page(${lastFetchedPage.value + 1}) in demand...");
@@ -142,7 +161,7 @@ class PaginationController<T> extends ChangeNotifier{
     );
   }
 
-  Future<void> addNextPage(List<T> pageData) async{
+  Future<void> addNextPage(List<T> pageData) async {
     debugPrint("Setting and adding data");
     state.value = PaginationLoadState.loaded;
     items.value.addAll(pageData);
@@ -154,7 +173,7 @@ class PaginationController<T> extends ChangeNotifier{
   void setLastPageData(List<T> pageData) {
     items.value.addAll(pageData);
     items.notifyListeners();
-    if(items.value.isEmpty) {
+    if (items.value.isEmpty) {
       setNoPages();
       return;
     }

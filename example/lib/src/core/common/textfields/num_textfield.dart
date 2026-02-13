@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 
 class NumTextfield extends StatefulWidget {
   final String initialText;
-  final Function (String text) onChanged;
-  final Function (String text) validationCheck;
+  final Function(String text) onChanged;
+  final Function(String text) validationCheck;
   final VoidCallback onTap;
   final String hintText;
   final String labelText;
@@ -23,8 +23,10 @@ class NumTextfield extends StatefulWidget {
     required this.onlyInteger,
     this.numRegExp,
     this.prefiexIcon,
-    super.key, required this.onTap, this.suffixWidget
-    });
+    super.key,
+    required this.onTap,
+    this.suffixWidget,
+  });
 
   @override
   State<NumTextfield> createState() => _NumTextfieldState();
@@ -56,15 +58,11 @@ class _NumTextfieldState extends State<NumTextfield> {
         onTap: () {
           _focusNode.requestFocus();
 
-          setState(() {
-            
-          });
+          setState(() {});
         },
-        onTapOutside: (event){
+        onTapOutside: (event) {
           _focusNode.unfocus();
-          setState(() {
-            
-          });
+          setState(() {});
         },
         focusNode: _focusNode,
         maxLines: widget.maxLines,
@@ -76,13 +74,18 @@ class _NumTextfieldState extends State<NumTextfield> {
             maxWidth: constraints.maxWidth * 0.2,
           ),
           suffix: widget.suffixWidget,
-          prefixIcon: widget.prefiexIcon == null ? null : Icon(widget.prefiexIcon),
+          prefixIcon: widget.prefiexIcon == null
+              ? null
+              : Icon(widget.prefiexIcon),
           hintText: widget.hintText,
           labelText: widget.labelText,
         ),
-        keyboardType: TextInputType.numberWithOptions(decimal: !widget.onlyInteger),
+        keyboardType: TextInputType.numberWithOptions(
+          decimal: !widget.onlyInteger,
+        ),
         inputFormatters: [
-          if(widget.numRegExp != null) FilteringTextInputFormatter.allow(widget.numRegExp!),
+          if (widget.numRegExp != null)
+            FilteringTextInputFormatter.allow(widget.numRegExp!),
         ],
         onChanged: (value) {
           widget.onChanged(value);
@@ -93,5 +96,4 @@ class _NumTextfieldState extends State<NumTextfield> {
       ),
     );
   }
-
 }

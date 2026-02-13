@@ -27,8 +27,9 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final SignupFormState _form = SignupFormState();
-  final ProcessStatusNotifier processStatusNotifier =
-      ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: ProcessEnabled(message: ''),
+  );
   late final SnackbarNotifier snackbarNotifier;
 
   @override
@@ -61,9 +62,7 @@ class _SignupScreenState extends State<SignupScreen> {
       errorSnackbarNotifier: snackbarNotifier,
       onSuccessWithoutData: () {
         Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const EmailVerificationScreen(),
-          ),
+          MaterialPageRoute(builder: (_) => const EmailVerificationScreen()),
         );
       },
     );

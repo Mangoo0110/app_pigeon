@@ -1,12 +1,11 @@
-
 import 'package:flutter/material.dart';
 
 import '../../constants/assets.dart';
 import 'textfield_prefix_icon.dart';
 
 class PasswordTextfield extends StatefulWidget {
-  final Function (String text) onChanged;
-  final String? Function (String text) validationCheck;
+  final Function(String text) onChanged;
+  final String? Function(String text) validationCheck;
   final String hintText;
   final String labelText;
   final int maxLines;
@@ -18,8 +17,8 @@ class PasswordTextfield extends StatefulWidget {
     this.labelText = "Password",
     this.showPrefixIcon = true,
     required this.validationCheck,
-    super.key
-    });
+    super.key,
+  });
 
   @override
   State<PasswordTextfield> createState() => _PasswordTextfieldState();
@@ -27,7 +26,7 @@ class PasswordTextfield extends StatefulWidget {
 
 class _PasswordTextfieldState extends State<PasswordTextfield> {
   bool obscureState = true;
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState> ();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _controller = TextEditingController();
 
   final FocusNode _focusNode = FocusNode();
@@ -51,9 +50,8 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
     return Form(
       key: _formKey,
       child: TextFormField(
-        
-        onTapOutside: (event){
-            _focusNode.unfocus();
+        onTapOutside: (event) {
+          _focusNode.unfocus();
         },
         focusNode: _focusNode,
         maxLines: widget.maxLines,
@@ -63,28 +61,28 @@ class _PasswordTextfieldState extends State<PasswordTextfield> {
         style: Theme.of(context).textTheme.bodyMedium,
         enabled: true,
         decoration: InputDecoration(
-          prefixIcon: widget.showPrefixIcon ? TextfieldPrefixIcon(assetName: Assets.lock) : null,
+          prefixIcon: widget.showPrefixIcon
+              ? TextfieldPrefixIcon(assetName: Assets.lock)
+              : null,
           suffixIcon: GestureDetector(
             onTap: () {
               setState(() {
                 obscureState = !obscureState;
               });
             },
-            child: obscureState ?
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.visibility,),
-              )
-              :
-              const Padding(
-                padding: EdgeInsets.all(8.0),
-                child: Icon(Icons.visibility_off, color: Colors.grey,),
-              )
+            child: obscureState
+                ? const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.visibility),
+                  )
+                : const Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: Icon(Icons.visibility_off, color: Colors.grey),
+                  ),
           ),
           //alignLabelWithHint: true,
           hintText: widget.hintText,
           label: Text(widget.labelText),
-          
         ),
         onChanged: (value) {
           _formKey.currentState!.validate();

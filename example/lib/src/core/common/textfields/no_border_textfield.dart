@@ -1,10 +1,10 @@
-
 import 'package:example/src/core/utils/extensions/textstyle_ext.dart';
 import 'package:flutter/material.dart';
+
 class NoBorderTextfield extends StatefulWidget {
   final TextEditingController? controller;
-  final Function (String text) onChanged;
-  final Function (String text) validationCheck;
+  final Function(String text) onChanged;
+  final Function(String text) validationCheck;
   final String hintText;
   final String labelText;
   final int? maxLines;
@@ -21,15 +21,15 @@ class NoBorderTextfield extends StatefulWidget {
     this.prefiexIcon,
     this.suffixIcon,
     this.readOnly = false,
-    super.key, 
-    });
+    super.key,
+  });
 
   @override
   State<NoBorderTextfield> createState() => _NoBorderTextfieldState();
 }
 
 class _NoBorderTextfieldState extends State<NoBorderTextfield> {
-  final FocusNode _focusNode = FocusNode(); 
+  final FocusNode _focusNode = FocusNode();
   late TextEditingController _controller;
 
   @override
@@ -49,16 +49,15 @@ class _NoBorderTextfieldState extends State<NoBorderTextfield> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => TextFormField(
-        onTapOutside: (event){
+        onTapOutside: (event) {
           _focusNode.unfocus();
         },
         focusNode: _focusNode,
         maxLines: widget.maxLines,
         controller: widget.controller,
         style: TextStyle().regular,
-        
+
         decoration: InputDecoration(
-          
           prefixIcon: widget.prefiexIcon,
           suffixIcon: widget.suffixIcon,
           contentPadding: EdgeInsets.symmetric(vertical: 6),
@@ -75,7 +74,6 @@ class _NoBorderTextfieldState extends State<NoBorderTextfield> {
         ),
         onChanged: (value) {
           widget.onChanged(value);
-          
         },
         validator: (value) {
           return widget.validationCheck(value!);

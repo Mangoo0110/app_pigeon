@@ -1,5 +1,3 @@
-
-
 DateTime parseDateTime(dynamic dateData) {
   return dateData == null
       ? DateTime.now()

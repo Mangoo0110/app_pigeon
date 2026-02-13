@@ -6,7 +6,7 @@ class MyRefreshTokenManager implements RefreshTokenManagerInterface {
   @override
   final String url;
 
-  MyRefreshTokenManager():url = ApiEndpoints.refreshToken;
+  MyRefreshTokenManager() : url = ApiEndpoints.refreshToken;
 
   @override
   Future<RefreshTokenResponse> refreshToken({
@@ -14,17 +14,11 @@ class MyRefreshTokenManager implements RefreshTokenManagerInterface {
     required Dio dio,
   }) async {
     debugPrint("Refreshing token with $refreshToken");
-    final res = await dio.post(
-      url,
-      data: {
-        'refreshToken': refreshToken,
-      },
-    );
+    final res = await dio.post(url, data: {'refreshToken': refreshToken});
 
     debugPrint("Refresh token response: ${res.data}");
 
     debugPrint(res.data.toString());
-    
 
     return RefreshTokenResponse(
       accessToken: res.data["data"]['accessToken'],
@@ -32,10 +26,13 @@ class MyRefreshTokenManager implements RefreshTokenManagerInterface {
       data: res.data["data"],
     );
   }
-  
+
   @override
-  Future<bool> shouldRefresh(DioException err, ErrorInterceptorHandler handler) async{
-    if(err.response?.statusCode == 401) {
+  Future<bool> shouldRefresh(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    if (err.response?.statusCode == 401) {
       return true;
     }
     return false;
