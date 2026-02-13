@@ -116,15 +116,6 @@ base class AuthStorage implements AuthStorageInterface{
   }
 
   @override
-  Future<void> switchCurrentAuth({required String uid}) async {
-    final auth = await _authManager.read(uId: uid);
-    if (auth == null) {
-      throw Exception("Auth with uid $uid does not exist.");
-    }
-    await _currentAuthUidManager.saveCurrentAuthRef(uid);
-  }
-
-  @override
   Future<void> clearCurrentAuthRecord() async {
     _authDebugger.dekhao("Clearing auth record");
     await _authManager.delete(uId: (await _currentAuthUidManager.read()) ?? "");

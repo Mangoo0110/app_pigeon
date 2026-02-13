@@ -24,9 +24,19 @@ const signAccessToken = (user) =>
 
 const issueRefreshToken = () => crypto.randomBytes(32).toString("hex");
 
-const buildAuthPayload = ({ userId, accessToken, refreshToken, isVerified }) => ({
+const buildAuthPayload = ({
+  userId,
+  userName,
+  accessToken,
+  refreshToken,
+  isVerified,
+}) => ({
+  id: userId,
+  uid: userId,
   userId,
   user_id: userId,
+  userName,
+  user_name: userName,
   accessToken,
   access_token: accessToken,
   refreshToken,
@@ -130,6 +140,7 @@ export const loginUser = async ({ email, userName, password }) => {
 
   return buildAuthPayload({
     userId: user._id.toString(),
+    userName: user.userName,
     accessToken,
     refreshToken,
     isVerified,
@@ -169,6 +180,7 @@ export const refreshUserToken = async ({ refreshToken }) => {
 
   return buildAuthPayload({
     userId: user._id.toString(),
+    userName: user.userName,
     accessToken,
     refreshToken: newRefreshToken,
     isVerified,
