@@ -1,4 +1,4 @@
-part of '../authorized_app_pigeon.dart';
+part of '../authorized_pigeon.dart';
 
 class _PendingRequest {
   _PendingRequest({
@@ -39,6 +39,7 @@ class ApiCallInterceptor extends Interceptor{
   /// Catch errors like 401 and retry with new access token if access token expires.
   @override
   Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+    debugPrint('Request failed: ${err.toString()}');
     final requestOptions = err.requestOptions;
     final apiName = '${requestOptions.method} ${requestOptions.path}';
     if (err.type == DioExceptionType.connectionTimeout ||

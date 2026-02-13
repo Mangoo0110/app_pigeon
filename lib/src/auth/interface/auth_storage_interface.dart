@@ -1,4 +1,4 @@
-import '../../authorized_app_pigeon.dart';
+import '../../authorized_pigeon.dart';
 
 abstract interface class AuthStorageInterface {
   /* ───────── Lifecycle ───────── */

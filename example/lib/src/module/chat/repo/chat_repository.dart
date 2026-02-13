@@ -6,6 +6,7 @@ import '../model/chat_message/chat_message.dart';
 
 abstract class ChatRepository with ErrorHandler {
   AsyncRequest<void> connectToUniversalChat({String joinId = 'global_chat'});
+  AsyncRequest<List<ChatMessage>> fetchPreviousMessages({int limit = 50});
   Stream<ChatMessage> get messageStream;
   AsyncRequest<void> sendMessage(
     SendMessageParam message, {
@@ -26,6 +27,13 @@ class ChatRepositoryStub extends ChatRepository {
   @override
   AsyncRequest<void> connectToUniversalChat({String joinId = 'global_chat'}) {
     return Future<ApiResponse<void>>.value(_notImplemented('Connect chat'));
+  }
+
+  @override
+  AsyncRequest<List<ChatMessage>> fetchPreviousMessages({int limit = 50}) {
+    return Future<ApiResponse<List<ChatMessage>>>.value(
+      _notImplemented('Fetch previous messages'),
+    );
   }
 
   @override
