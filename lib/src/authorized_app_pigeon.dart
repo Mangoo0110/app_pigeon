@@ -77,6 +77,11 @@ class AuthorizedAppPigeon with PigeonErrorHandler implements AppPigeon {
     _socketService.dispose();
   }
 
+  /// Disconnects socket listeners/connection without touching auth storage.
+  void disconnectSocket() {
+    _socketService.dispose();
+  }
+
   Stream<AuthStatus> get authStream => _authStorage.authStream;
 
   Future<void> saveNewAuth({required SaveNewAuthParams saveAuthParams}) async {
