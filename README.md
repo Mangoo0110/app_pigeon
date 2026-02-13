@@ -323,8 +323,3 @@ This repository includes an `example/` app and example backend showing:
 3. ghost identity flow
 4. realtime universal chat
 
-## Notes
-
-1. Keep `RefreshTokenManagerInterface` implementation deterministic and side-effect free.
-2. Always hash secret-like values on backend (for example ghost passkeys).
-3. Do not trust sender identity from client payload; resolve identity on backend.
