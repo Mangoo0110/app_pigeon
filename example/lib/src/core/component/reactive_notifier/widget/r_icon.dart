@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import '../process_notifier.dart';
 
@@ -37,10 +36,9 @@ class RIcon extends StatefulWidget {
 }
 
 class _RIconState extends State<RIcon> {
-
   _listenUpdate() {
-    if(widget.processStatusNotifier.status == ProcessSuccess()){
-      if(widget.onDone != null) widget.onDone!();
+    if (widget.processStatusNotifier.status == ProcessSuccess()) {
+      if (widget.onDone != null) widget.onDone!();
     }
   }
 
@@ -69,18 +67,25 @@ class _RIconState extends State<RIcon> {
                 builder: (context) {
                   return switch (widget.processStatusNotifier.status) {
                     ProcessEnabled _ => widget.iconWidget,
-                    ProcessDisabled _ => widget.disableStateWidget ?? Icon(Icons.block, color: widget.iconColor),
-                    ProcessLoading _ => widget.loadingStateWidget ?? Icon(Icons.hourglass_empty, color: widget.iconColor),
-                    ProcessFailed _ => widget.errorStateWidget ?? Icon(Icons.error, color: widget.iconColor),
-                    ProcessSuccess _ => widget.doneStateWidget ?? Icon(Icons.check, color: widget.iconColor),
+                    ProcessDisabled _ =>
+                      widget.disableStateWidget ??
+                          Icon(Icons.block, color: widget.iconColor),
+                    ProcessLoading _ =>
+                      widget.loadingStateWidget ??
+                          Icon(Icons.hourglass_empty, color: widget.iconColor),
+                    ProcessFailed _ =>
+                      widget.errorStateWidget ??
+                          Icon(Icons.error, color: widget.iconColor),
+                    ProcessSuccess _ =>
+                      widget.doneStateWidget ??
+                          Icon(Icons.check, color: widget.iconColor),
                   };
                 },
-              )
+              ),
             );
-          }
+          },
         );
       },
     );
   }
-
 }

@@ -1,4 +1,3 @@
-
 import 'package:example/src/core/utils/extensions/textstyle_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -53,15 +52,15 @@ class PaginatedGridView<T> extends StatefulWidget {
 }
 
 class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
-
-  final ScrollController scrollController =ScrollController();
+  final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         widget.pagination.loadNextPage();
       }
     });
@@ -82,7 +81,7 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
         builder: (context, _) {
           final items = widget.pagination.items.value;
           final state = widget.pagination.state.value;
-      
+
           if (state == PaginationLoadState.nopages) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -95,10 +94,9 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
               ],
             ).animate().fadeIn(duration: 300.ms);
           }
-      
-          
+
           final itemCount = items.length + 1;
-      
+
           return CustomScrollView(
             controller: scrollController,
             slivers: [
@@ -112,7 +110,7 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
                 itemCount: itemCount,
                 itemBuilder: (context, index) {
                   final isFooter = index == items.length;
-              
+
                   // Footer: Loading/Refreshing => show skeleton tiles
                   // if (isFooter &&
                   //     (state == PaginationLoadState.loading ||
@@ -122,10 +120,9 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
                   //     count: widget.skeletonCount,
                   //   ).animate().fadeIn(duration: 300.ms);
                   // }
-              
+
                   // Footer: All loaded => show "End"
-                  
-              
+
                   // Normal grid item
                   if (!isFooter) {
                     final element = items[index];
@@ -138,19 +135,16 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
                           duration: 300.ms,
                           curve: Curves.easeOutCubic,
                         )
-                        .fadeIn(
-                          duration: 300.ms,
-                          curve: Curves.easeOutCubic,
-                        );
+                        .fadeIn(duration: 300.ms, curve: Curves.easeOutCubic);
                   }
-              
+
                   // Footer: default empty space (when not loading / not allLoaded)
                   return const SizedBox.shrink();
                 },
               ),
               SliverToBoxAdapter(
                 child: ValueListenableBuilder(
-                  valueListenable: widget.pagination.state, 
+                  valueListenable: widget.pagination.state,
                   builder: (context, value, child) {
                     debugPrint("load end indication state ${value.name}");
                     if (value == PaginationLoadState.allLoaded) {
@@ -159,25 +153,33 @@ class _PaginatedGridViewState<T> extends State<PaginatedGridView<T>> {
                           padding: const EdgeInsets.all(8.0),
                           child: Text(
                             "End of the page",
-                            style: const TextStyle(fontStyle: FontStyle.normal, fontSize: 14, color: Colors.grey).bold,
+                            style: const TextStyle(
+                              fontStyle: FontStyle.normal,
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ).bold,
                           ),
                         ),
                       ).animate().fadeIn(duration: 300.ms);
-                    } else if(value == PaginationLoadState.loading || value == PaginationLoadState.refreshing) {
+                    } else if (value == PaginationLoadState.loading ||
+                        value == PaginationLoadState.refreshing) {
                       return Center(
                         child: SizedBox(
                           height: 30,
                           width: 30,
                           child: CircularProgressIndicator(
                             strokeWidth: 4,
-                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.context(context).primaryColor),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.context(context).primaryColor,
+                            ),
                           ),
-                        )
+                        ),
                       );
                     }
                     return Container();
-                  },),
-              )
+                  },
+                ),
+              ),
             ],
           );
         },
@@ -192,10 +194,7 @@ class _SkeletonGrid extends StatelessWidget {
   final Widget skeleton;
   final int count;
 
-  const _SkeletonGrid({
-    required this.skeleton,
-    required this.count,
-  });
+  const _SkeletonGrid({required this.skeleton, required this.count});
 
   @override
   Widget build(BuildContext context) {

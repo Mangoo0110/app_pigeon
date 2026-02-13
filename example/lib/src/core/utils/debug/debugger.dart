@@ -1,6 +1,5 @@
 part of 'debug_service.dart';
 
-
 class Debugger {
   final DebugLabel debugLabel;
 
@@ -27,11 +26,9 @@ class AudioDebugger extends Debugger {
   AudioDebugger() : super(debugLabel: DebugLabel.audio);
 }
 
-
 class UIDebugger extends Debugger {
   UIDebugger() : super(debugLabel: DebugLabel.ui);
 }
-
 
 class ControllerDebugger extends Debugger {
   ControllerDebugger() : super(debugLabel: DebugLabel.controller);

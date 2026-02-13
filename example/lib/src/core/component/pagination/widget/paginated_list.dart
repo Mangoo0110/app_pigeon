@@ -8,6 +8,7 @@ import '../pagination.dart';
 class PaginatedListWidget<T> extends StatefulWidget {
   final PaginationController<T> pagination;
   final Widget skeleton;
+
   /// How many skeletons to show, when there is no data
   final int skeletonCount;
   final String emptyMessage;
@@ -18,7 +19,7 @@ class PaginatedListWidget<T> extends StatefulWidget {
     required this.skeleton,
     required this.skeletonCount,
     required this.builder,
-    this.emptyMessage = "No data found"
+    this.emptyMessage = "No data found",
   });
 
   @override
@@ -26,14 +27,15 @@ class PaginatedListWidget<T> extends StatefulWidget {
 }
 
 class _PaginatedListWidgetState<T> extends State<PaginatedListWidget<T>> {
-    final ScrollController scrollController = ScrollController();
+  final ScrollController scrollController = ScrollController();
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     scrollController.addListener(() {
-      if (scrollController.position.pixels == scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         widget.pagination.loadNextPage();
       }
     });
@@ -58,21 +60,25 @@ class _PaginatedListWidgetState<T> extends State<PaginatedListWidget<T>> {
           builder: (context, _) {
             final items = widget.pagination.items.value;
             debugPrint("${widget.pagination.state.value}");
-            if(widget.pagination.state.value == PaginationLoadState.nopages) {
+            if (widget.pagination.state.value == PaginationLoadState.nopages) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Center(child: Text(widget.emptyMessage)),
-                  IconButton(onPressed: widget.pagination.refresh, icon: const Icon(Icons.refresh))
+                  IconButton(
+                    onPressed: widget.pagination.refresh,
+                    icon: const Icon(Icons.refresh),
+                  ),
                 ],
               ).animate().fadeIn(duration: 300.ms);
-            
             }
 
-            if(widget.pagination.state.value == PaginationLoadState.idle) {
-              return Center(child: Text("Pull to refresh!")).animate().fadeIn(duration: 300.ms);
+            if (widget.pagination.state.value == PaginationLoadState.idle) {
+              return Center(
+                child: Text("Pull to refresh!"),
+              ).animate().fadeIn(duration: 300.ms);
             }
-            
+
             return ListView.builder(
               physics: NeverScrollableScrollPhysics(),
               itemCount: items.length + 1,
@@ -84,24 +90,34 @@ class _PaginatedListWidgetState<T> extends State<PaginatedListWidget<T>> {
                 debugPrint(
                   "Index: $index, length: ${items.length}, state: ${widget.pagination.state.value}",
                 );
-                if ((index == items.length) && (widget.pagination.state.value == PaginationLoadState.loading ||
-                      widget.pagination.state.value == PaginationLoadState.refreshing)) {
-                        //return Container();
-                    // Skeleton
-                    return Column(
-                      children: [
-                        ...List.generate(
-                          widget.skeletonCount,
-                          (_) => Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: widget.skeleton,
-                          ),
+                if ((index == items.length) &&
+                    (widget.pagination.state.value ==
+                            PaginationLoadState.loading ||
+                        widget.pagination.state.value ==
+                            PaginationLoadState.refreshing)) {
+                  //return Container();
+                  // Skeleton
+                  return Column(
+                    children: [
+                      ...List.generate(
+                        widget.skeletonCount,
+                        (_) => Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: widget.skeleton,
                         ),
-                      ],
-                    ).animate().fadeIn(duration: 300.ms);
-                  }
-                if((widget.pagination.state.value == PaginationLoadState.allLoaded && index == items.length)) {
-                  return Center(child: Text("End", style: TextStyle(fontStyle: FontStyle.italic).w500,)).animate().fadeIn(duration: 300.ms);
+                      ),
+                    ],
+                  ).animate().fadeIn(duration: 300.ms);
+                }
+                if ((widget.pagination.state.value ==
+                        PaginationLoadState.allLoaded &&
+                    index == items.length)) {
+                  return Center(
+                    child: Text(
+                      "End",
+                      style: TextStyle(fontStyle: FontStyle.italic).w500,
+                    ),
+                  ).animate().fadeIn(duration: 300.ms);
                 }
                 final element = items[index];
                 return widget.builder(index, element)
@@ -117,7 +133,7 @@ class _PaginatedListWidgetState<T> extends State<PaginatedListWidget<T>> {
                 ;
               },
             );
-          }, 
+          },
         ),
       ),
     );

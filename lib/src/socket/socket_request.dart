@@ -1,5 +1,7 @@
 enum SocketRequestType {
-  connect, emit, disconnect;
+  connect,
+  emit,
+  disconnect;
 
   static SocketRequestType? fromString(String value) {
     switch (value) {
@@ -22,12 +24,14 @@ abstract base class SocketRequest {
   Map<String, dynamic> toMap();
 }
 
-final class SocketConnectRequest extends SocketRequest{
+final class SocketConnectRequest extends SocketRequest {
   final String url;
   final String token;
   final String userId;
 
-  SocketConnectRequest({required this.url, required this.token, required this.userId}): super(SocketRequestType.connect);
+  SocketConnectRequest(
+      {required this.url, required this.token, required this.userId})
+      : super(SocketRequestType.connect);
 
   @override
   Map<String, dynamic> toMap() {
@@ -38,15 +42,15 @@ final class SocketConnectRequest extends SocketRequest{
       'userId': userId,
     };
   }
-
 }
 
 final class SocketEmitRequest extends SocketRequest {
   final String event;
   final dynamic data;
 
-  SocketEmitRequest({required this.event, required this.data}): super(SocketRequestType.emit);
-  
+  SocketEmitRequest({required this.event, required this.data})
+      : super(SocketRequestType.emit);
+
   @override
   Map<String, dynamic> toMap() {
     return {
@@ -58,7 +62,7 @@ final class SocketEmitRequest extends SocketRequest {
 }
 
 final class SocketDisconnectRequest extends SocketRequest {
-  SocketDisconnectRequest(): super(SocketRequestType.disconnect);
+  SocketDisconnectRequest() : super(SocketRequestType.disconnect);
   @override
   Map<String, dynamic> toMap() {
     return {

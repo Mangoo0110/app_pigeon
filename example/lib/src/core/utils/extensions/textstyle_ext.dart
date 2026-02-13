@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 extension TextstyleExt on TextStyle {
-
   TextStyle get w100 => copyWith(fontWeight: FontWeight.w100);
   TextStyle get w200 => copyWith(fontWeight: FontWeight.w200);
   TextStyle get w300 => copyWith(fontWeight: FontWeight.w300);
@@ -13,7 +12,6 @@ extension TextstyleExt on TextStyle {
   TextStyle get w900 => copyWith(fontWeight: FontWeight.w900);
   TextStyle get bold => copyWith(fontWeight: FontWeight.bold);
 
-  
   TextStyle get regular => copyWith(fontSize: 16);
   TextStyle get chatMessageSize => copyWith(fontSize: 14);
   TextStyle get regularX => copyWith(fontSize: 18);

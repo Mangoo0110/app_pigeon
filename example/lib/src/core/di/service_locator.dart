@@ -14,10 +14,8 @@ final GetIt serviceLocator = GetIt.instance;
 const String kAuthorizedPigeon = 'authorized_pigeon';
 const String kGhostPigeon = 'ghost_pigeon';
 
-AuthorizedPigeon get authorizedPigeon =>
-    serviceLocator<AuthorizedPigeon>();
-GhostPigeon get ghostPigeon =>
-    serviceLocator<GhostPigeon>();
+AuthorizedPigeon get authorizedPigeon => serviceLocator<AuthorizedPigeon>();
+GhostPigeon get ghostPigeon => serviceLocator<GhostPigeon>();
 AppPigeon get authorizedClient =>
     serviceLocator<AppPigeon>(instanceName: kAuthorizedPigeon);
 AppPigeon get ghostClient =>
@@ -42,7 +40,7 @@ class ActivePigeonResolver {
   void useGhost() => _current = ghost;
 }
 
-Future<void> setupServiceLocator() async{
+Future<void> setupServiceLocator() async {
   if (serviceLocator.isRegistered<AuthRepository>()) {
     return;
   }
@@ -66,10 +64,7 @@ Future<void> setupServiceLocator() async{
     instanceName: kGhostPigeon,
   );
   serviceLocator.registerSingleton<ActivePigeonResolver>(
-    ActivePigeonResolver(
-      authorized: authorized,
-      ghost: ghost,
-    ),
+    ActivePigeonResolver(authorized: authorized, ghost: ghost),
   );
 
   // Backward compatibility for existing modules currently assuming authorized client.
@@ -78,6 +73,7 @@ Future<void> setupServiceLocator() async{
   serviceLocator.registerSingleton<ChatRepository>(
     ChatRepoImpl(() => serviceLocator<ActivePigeonResolver>().current),
   );
-  serviceLocator.registerSingleton<ProfileRepository>(ProfileRepoImpl(authorized));
-
+  serviceLocator.registerSingleton<ProfileRepository>(
+    ProfileRepoImpl(authorized),
+  );
 }

@@ -20,9 +20,7 @@ class ProfileRepositoryStub extends ProfileRepository {
 
   @override
   AsyncRequest<Profile> fetchProfile() {
-    return Future<ApiResponse<Profile>>.value(
-      _notImplemented('Fetch profile'),
-    );
+    return Future<ApiResponse<Profile>>.value(_notImplemented('Fetch profile'));
   }
 
   @override

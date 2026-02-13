@@ -1,7 +1,6 @@
 import '../../app_pigeon.dart';
 
 abstract class Authorization {
-
   Stream<AuthStatus> get authStream;
 
   Future<void> saveNewAuth({required SaveNewAuthParams saveAuthParams});
@@ -21,5 +20,4 @@ abstract class Authorization {
 
   /// Switches current auth by uid.
   Future<void> switchAccount({required String uid});
-
 }

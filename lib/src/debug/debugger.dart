@@ -1,6 +1,5 @@
 part of 'debug_service.dart';
 
-
 class Debugger {
   final DebugLabel debugLabel;
 

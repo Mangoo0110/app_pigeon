@@ -12,9 +12,6 @@ class AuthLinkButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextButton(
-      onPressed: onPressed,
-      child: Text(label),
-    );
+    return TextButton(onPressed: onPressed, child: Text(label));
   }
 }

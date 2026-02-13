@@ -29,14 +29,15 @@ class Profile with _$Profile {
   });
 
   static Profile get empty => Profile(
-        id: '',
-        uid: '',
-        userName: '',
-        fullName: '',
-        email: '',
-        isVerified: false,
-      );
+    id: '',
+    uid: '',
+    userName: '',
+    fullName: '',
+    email: '',
+    isVerified: false,
+  );
 
-  factory Profile.fromJson(Map<String, dynamic> json) => _$ProfileFromJson(json);
+  factory Profile.fromJson(Map<String, dynamic> json) =>
+      _$ProfileFromJson(json);
   Map<String, dynamic> toJson() => _$ProfileToJson(this);
 }

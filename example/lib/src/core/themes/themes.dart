@@ -1,4 +1,3 @@
-
 import '../utils/extensions/textstyle_ext.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,6 +22,7 @@ part 'tabbar_theme.dart';
 part 'text_theme.dart';
 part 'text_selection_theme.dart';
 part 'slider_theme.dart';
+
 class AppTheme {
   AppTheme();
 
@@ -45,26 +45,23 @@ class AppTheme {
       shadowColor: AppColors.light().shadowColor,
       dividerColor: AppColors.light().dividerColor,
       cardColor: AppColors.light().tileColor,
-      
+
       useMaterial3: true,
       fontFamily: 'Public Sans',
       brightness: Brightness.light,
       colorScheme: ColorScheme.fromSwatch(
-        primarySwatch: MaterialColor(
-          AppColors.light().primaryColor.value,
-          {
-            50:  AppColors.light().primaryColor.withAlpha(25),
-            100: AppColors.light().primaryColor.withAlpha(50),
-            200: AppColors.light().primaryColor.withAlpha(76),
-            300: AppColors.light().primaryColor.withAlpha(102),
-            400: AppColors.light().primaryColor.withAlpha(128),
-            500: AppColors.light().primaryColor,
-            600: AppColors.light().primaryColor,
-            700: AppColors.light().primaryColor,
-            800: AppColors.light().primaryColor,
-            900: AppColors.light().primaryColor,
-          },
-        ),
+        primarySwatch: MaterialColor(AppColors.light().primaryColor.value, {
+          50: AppColors.light().primaryColor.withAlpha(25),
+          100: AppColors.light().primaryColor.withAlpha(50),
+          200: AppColors.light().primaryColor.withAlpha(76),
+          300: AppColors.light().primaryColor.withAlpha(102),
+          400: AppColors.light().primaryColor.withAlpha(128),
+          500: AppColors.light().primaryColor,
+          600: AppColors.light().primaryColor,
+          700: AppColors.light().primaryColor,
+          800: AppColors.light().primaryColor,
+          900: AppColors.light().primaryColor,
+        }),
         accentColor: AppColors.light().primaryColor,
         backgroundColor: AppColors.light().backgroundColor,
         cardColor: AppColors.light().backgroundColor,
@@ -86,7 +83,6 @@ class AppTheme {
       tabBarTheme: DTabBarTheme.lightTabBarTheme,
       listTileTheme: ListTileThemeData(
         selectedTileColor: AppColors.light().splashColor,
-        
       ),
       indicatorColor: AppColors.light().backgroundColor,
       dividerTheme: DDividerTheme.lightDividerTheme,
@@ -94,28 +90,25 @@ class AppTheme {
       datePickerTheme: DatePickerThemes.lightTheme,
       elevatedButtonTheme: ElevatedButtonThemes.light,
       floatingActionButtonTheme: FloatingActionButtonThemes.lightTheme,
-      sliderTheme: AppSliderTheme.lightTheme
+      sliderTheme: AppSliderTheme.lightTheme,
     );
   }
 
   ThemeData get darkTheme {
     return ThemeData(
       primaryColor: AppColors.dark().primaryColor,
-      primarySwatch:  MaterialColor(
-          AppColors.light().primaryColor.toARGB32(),
-          {
-            50:  AppColors.light().primaryColor.withAlpha(25),
-            100: AppColors.light().primaryColor.withAlpha(50),
-            200: AppColors.light().primaryColor.withAlpha(76),
-            300: AppColors.light().primaryColor.withAlpha(102),
-            400: AppColors.light().primaryColor.withAlpha(128),
-            500: AppColors.light().primaryColor,
-            600: AppColors.light().primaryColor,
-            700: AppColors.light().primaryColor,
-            800: AppColors.light().primaryColor,
-            900: AppColors.light().primaryColor,
-          },
-        ),
+      primarySwatch: MaterialColor(AppColors.light().primaryColor.toARGB32(), {
+        50: AppColors.light().primaryColor.withAlpha(25),
+        100: AppColors.light().primaryColor.withAlpha(50),
+        200: AppColors.light().primaryColor.withAlpha(76),
+        300: AppColors.light().primaryColor.withAlpha(102),
+        400: AppColors.light().primaryColor.withAlpha(128),
+        500: AppColors.light().primaryColor,
+        600: AppColors.light().primaryColor,
+        700: AppColors.light().primaryColor,
+        800: AppColors.light().primaryColor,
+        900: AppColors.light().primaryColor,
+      }),
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.light().primaryColor,
@@ -150,7 +143,7 @@ class AppTheme {
       buttonTheme: DButtonTheme.darkButtonTheme,
       bottomSheetTheme: DBottomSheetTheme.darkBottomSheetTheme,
       checkboxTheme: DCheckboxTheme.darkCheckboxTheme,
-     // cardTheme: DCardTheme.darkCardTheme,
+      // cardTheme: DCardTheme.darkCardTheme,
       tabBarTheme: DTabBarTheme.darkTabBarTheme,
       bottomNavigationBarTheme: DBottomNavigationBarThemes.darkBottomNavTheme,
       dividerTheme: DDividerTheme.darkDividerTheme,
@@ -158,7 +151,7 @@ class AppTheme {
       progressIndicatorTheme: ProgressIndicatorThemes.dark,
       datePickerTheme: DatePickerThemes.darkTheme,
       elevatedButtonTheme: ElevatedButtonThemes.dark,
-      sliderTheme: AppSliderTheme.darkTheme
+      sliderTheme: AppSliderTheme.darkTheme,
     );
   }
 }

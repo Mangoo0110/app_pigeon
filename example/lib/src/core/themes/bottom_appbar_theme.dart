@@ -4,7 +4,7 @@ class DBottomAppBarTheme {
   DBottomAppBarTheme._(); // Private constructor
 
   // Light BottomAppBarThemeData
-  
+
   static BottomAppBarThemeData lightBottomAppBarTheme = BottomAppBarThemeData(
     color: AppColors.light().backgroundColor,
     elevation: 8,

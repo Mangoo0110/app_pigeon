@@ -18,18 +18,10 @@ class SignupRequest {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'password': password,
-      'userName': userName,
-    };
+    return {'email': email, 'password': password, 'userName': userName};
   }
 
-  SignupRequest copyWith({
-    String? email,
-    String? password,
-    String? userName,
-  }) {
+  SignupRequest copyWith({String? email, String? password, String? userName}) {
     return SignupRequest(
       email: email ?? this.email,
       password: password ?? this.password,

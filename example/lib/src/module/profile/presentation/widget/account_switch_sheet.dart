@@ -34,9 +34,7 @@ class _AccountSwitchSheetState extends State<AccountSwitchSheet> {
   @override
   void initState() {
     super.initState();
-    _fullNameController = TextEditingController(
-      text: widget.profile.fullName,
-    );
+    _fullNameController = TextEditingController(text: widget.profile.fullName);
   }
 
   @override
@@ -47,7 +45,9 @@ class _AccountSwitchSheetState extends State<AccountSwitchSheet> {
 
   @override
   Widget build(BuildContext context) {
-    final email = widget.profile.email.isNotEmpty ? widget.profile.email : "Unknown";
+    final email = widget.profile.email.isNotEmpty
+        ? widget.profile.email
+        : "Unknown";
     final userId = widget.profile.uid.isNotEmpty ? widget.profile.uid : "-";
     final isVerified = widget.profile.isVerified;
 
@@ -94,8 +94,10 @@ class _AccountSwitchSheetState extends State<AccountSwitchSheet> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("All accounts",
-                    style: Theme.of(context).textTheme.titleSmall),
+                Text(
+                  "All accounts",
+                  style: Theme.of(context).textTheme.titleSmall,
+                ),
                 TextButton.icon(
                   onPressed: () async => widget.onAddAccount(),
                   icon: const Icon(Icons.add),
@@ -113,17 +115,26 @@ class _AccountSwitchSheetState extends State<AccountSwitchSheet> {
                       itemCount: widget.accounts.length,
                       itemBuilder: (context, index) {
                         final auth = widget.accounts[index];
-                        final uid = _value(auth.data, ["user_id", "userId", "uid", "id"]);
-                        final email = _value(auth.data, ["email", "userName", "name"]) ??
+                        final uid = _value(auth.data, [
+                          "user_id",
+                          "userId",
+                          "uid",
+                          "id",
+                        ]);
+                        final email =
+                            _value(auth.data, ["email", "userName", "name"]) ??
                             "Account";
-                        final isCurrent = uid != null &&
+                        final isCurrent =
+                            uid != null &&
                             widget.currentAccountUid != null &&
                             uid == widget.currentAccountUid;
                         return ListTile(
                           dense: true,
-                          leading: Icon(isCurrent
-                              ? Icons.check_circle
-                              : Icons.account_circle_outlined),
+                          leading: Icon(
+                            isCurrent
+                                ? Icons.check_circle
+                                : Icons.account_circle_outlined,
+                          ),
                           title: Text(email),
                           subtitle: Text(uid ?? "-"),
                           trailing: TextButton(

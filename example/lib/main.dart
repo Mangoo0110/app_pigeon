@@ -9,31 +9,28 @@ import 'src/core/di/service_locator.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
-void main() async{
-  
+void main() async {
+  runZonedGuarded(
+    () async {
+      FlutterError.onError = (FlutterErrorDetails details) {
+        FlutterError.presentError(details);
+        Zone.current.handleUncaughtError(
+          details.exception,
+          details.stack ?? StackTrace.current,
+        );
+      };
 
-  runZonedGuarded(() async {
-    FlutterError.onError = (FlutterErrorDetails details) {
-      FlutterError.presentError(details);
-      Zone.current.handleUncaughtError(
-        details.exception,
-        details.stack ?? StackTrace.current,
-      );
-    };
+      WidgetsFlutterBinding.ensureInitialized();
+      await setupServiceLocator();
+      runApp(const MyApp());
+    },
+    (error, stack) {
+      debugPrint('🔥 Uncaught error: $error');
+      debugPrintStack(stackTrace: stack);
 
-    WidgetsFlutterBinding.ensureInitialized();
-    await setupServiceLocator();
-    runApp(const MyApp());
-
-    
-  }, (error, stack) {
-    debugPrint('🔥 Uncaught error: $error');
-    debugPrintStack(stackTrace: stack);
-
-    // Optional: report to Crashlytics / Sentry
-  });
-
-  
+      // Optional: report to Crashlytics / Sentry
+    },
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -53,6 +50,7 @@ class _MyAppState extends State<MyApp> {
       AppManager().initialize();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -65,15 +63,13 @@ class _MyAppState extends State<MyApp> {
         return AppRouter.onGenerateRoute(settings);
       },
       builder: (context, child) {
-        return child ?? Scaffold(
-          body: Center(child: CircularProgressIndicator()),
-        );
+        return child ??
+            Scaffold(body: Center(child: CircularProgressIndicator()));
       },
-      home: FakeApp()
+      home: FakeApp(),
     );
   }
 }
-
 
 class FakeApp extends StatelessWidget {
   const FakeApp({super.key});

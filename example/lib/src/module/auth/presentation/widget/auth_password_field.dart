@@ -10,7 +10,8 @@ class AuthPasswordField extends StatelessWidget {
     this.hintText,
     this.validator,
     this.textInputAction,
-    super.key, required this.onChanged,
+    super.key,
+    required this.onChanged,
   });
 
   final TextEditingController controller;
@@ -33,7 +34,7 @@ class AuthPasswordField extends StatelessWidget {
           obscureText: !visible,
           textInputAction: textInputAction,
           validator: validator,
-          onChanged: onChanged ,
+          onChanged: onChanged,
           suffixIcon: IconButton(
             onPressed: () => isVisible.value = !visible,
             icon: Icon(visible ? Icons.visibility_off : Icons.visibility),

@@ -9,6 +9,6 @@ class AppGradients {
       AppColors.light().primaryColor.withAlpha(50),
       Colors.black,
       AppColors.light().primaryColor.withAlpha(50),
-    ] 
+    ],
   );
 }

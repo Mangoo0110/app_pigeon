@@ -10,8 +10,7 @@ class _PendingRequest {
   final Completer<Response<dynamic>> completer;
 }
 
-class ApiCallInterceptor extends Interceptor{
-  
+class ApiCallInterceptor extends Interceptor {
   ApiCallInterceptor(this._authStorage, this.dio, this.refreshTokenManager);
 
   final Dio dio;
@@ -26,8 +25,10 @@ class ApiCallInterceptor extends Interceptor{
 
   /// Attaches access token to every request
   @override
-  Future<void> onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
-    _debugger.dekhao("Request API(${options.method}): ${options.uri.toString()}");
+  Future<void> onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
+    _debugger
+        .dekhao("Request API(${options.method}): ${options.uri.toString()}");
     final auth = await _authStorage.getCurrentAuth();
     final accessToken = auth?._accessToken;
     if (accessToken != null) {
@@ -35,10 +36,11 @@ class ApiCallInterceptor extends Interceptor{
     }
     handler.next(options);
   }
-  
+
   /// Catch errors like 401 and retry with new access token if access token expires.
   @override
-  Future<void> onError(DioException err, ErrorInterceptorHandler handler) async {
+  Future<void> onError(
+      DioException err, ErrorInterceptorHandler handler) async {
     debugPrint('Request failed: ${err.toString()}');
     final requestOptions = err.requestOptions;
     final apiName = '${requestOptions.method} ${requestOptions.path}';
@@ -51,7 +53,7 @@ class ApiCallInterceptor extends Interceptor{
 
     final status = await _authStorage.currentAuthStatus();
     final alreadyRetried = requestOptions.extra[_refreshRetriedKey] == true;
-    if(alreadyRetried) {
+    if (alreadyRetried) {
       _debugger.dekhao('Already retried for $apiName. Not retrying again.');
       return handler.reject(err);
     }
@@ -69,7 +71,8 @@ class ApiCallInterceptor extends Interceptor{
       }
 
       // Queue this request and resolve/reject it after refresh completes.
-      _debugger.dekhao('401 received for $apiName. Queuing request for refresh.');
+      _debugger
+          .dekhao('401 received for $apiName. Queuing request for refresh.');
       final completer = Completer<Response<dynamic>>();
       _pendingRequests.add(
         _PendingRequest(

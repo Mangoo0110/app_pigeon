@@ -1,9 +1,9 @@
-
 import 'package:flutter/material.dart';
+
 class UnderlineTextfield extends StatefulWidget {
   final TextEditingController? controller;
-  final Function (String text) onChanged;
-  final Function (String text) validationCheck;
+  final Function(String text) onChanged;
+  final Function(String text) validationCheck;
   final String hintText;
   final String labelText;
   final int? maxLines;
@@ -16,15 +16,15 @@ class UnderlineTextfield extends StatefulWidget {
     required this.labelText,
     required this.validationCheck,
     this.prefiexIcon,
-    super.key, 
-    });
+    super.key,
+  });
 
   @override
   State<UnderlineTextfield> createState() => _UnderlineTextfieldState();
 }
 
 class _UnderlineTextfieldState extends State<UnderlineTextfield> {
-  final FocusNode _focusNode = FocusNode(); 
+  final FocusNode _focusNode = FocusNode();
   late TextEditingController _controller;
 
   @override
@@ -46,7 +46,7 @@ class _UnderlineTextfieldState extends State<UnderlineTextfield> {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) => TextFormField(
-        onTapOutside: (event){
+        onTapOutside: (event) {
           _focusNode.unfocus();
         },
         focusNode: _focusNode,
@@ -67,7 +67,6 @@ class _UnderlineTextfieldState extends State<UnderlineTextfield> {
         ),
         onChanged: (value) {
           widget.onChanged(value);
-          
         },
         validator: (value) {
           return widget.validationCheck(value!);

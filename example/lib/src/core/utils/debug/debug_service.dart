@@ -8,13 +8,12 @@ enum DebugLabel {
   auth("Auth"),
   setting("Setting"),
   notification("Notification"),
-  audio("Audio"),;
+  audio("Audio");
 
   final String label;
 
   const DebugLabel(this.label);
 }
-
 
 class DebugService {
   final Set<DebugLabel> _allowsOnly;
@@ -22,19 +21,18 @@ class DebugService {
   DebugService._(this._allowsOnly);
 
   static DebugService? _instance;
+
   /// Singletone
   factory DebugService.instance({required Set<DebugLabel> allowsOnly}) {
-
     _instance ??= DebugService._(allowsOnly);
     return _instance!;
   }
 
   void dekhao(DebugLabel label, dynamic data) {
-    if(!_allowsOnly.contains(label)) return; 
+    if (!_allowsOnly.contains(label)) return;
     // Print, only if the debug label is present in the _allowOnly list.
-    if(kDebugMode) {
+    if (kDebugMode) {
       print("Debug >> ${label.label} >> ${data.toString()}");
     }
   }
 }
-

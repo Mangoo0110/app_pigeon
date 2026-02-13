@@ -19,8 +19,9 @@ class AccountListScreen extends StatefulWidget {
 }
 
 class _AccountListScreenState extends State<AccountListScreen> {
-  final ProcessStatusNotifier _messageProcess =
-      ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
+  final ProcessStatusNotifier _messageProcess = ProcessStatusNotifier(
+    initialStatus: ProcessEnabled(message: ''),
+  );
   late Future<List<Auth>> _accountsFuture;
   late Future<Auth?> _currentFuture;
 
@@ -42,8 +43,9 @@ class _AccountListScreenState extends State<AccountListScreen> {
   }
 
   void _reload() {
-    _accountsFuture =
-        serviceLocator<AuthRepository>().fetchAllAccounts().then((response) {
+    _accountsFuture = serviceLocator<AuthRepository>().fetchAllAccounts().then((
+      response,
+    ) {
       if (response is ErrorResponse<List<Auth>>) {
         _messageProcess.setError(message: response.message);
         _scheduleReset(_messageProcess);
@@ -62,9 +64,7 @@ class _AccountListScreenState extends State<AccountListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Accounts'),
-      ),
+      appBar: AppBar(title: const Text('Accounts')),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,14 +153,19 @@ class _AccountListScreenState extends State<AccountListScreen> {
                             final response =
                                 await serviceLocator<AuthRepository>()
                                     .switchAccount(
-                              uid: auth.data['uid']?.toString() ??
-                                  auth.data['id']?.toString() ??
-                                  '',
-                            );
+                                      uid:
+                                          auth.data['uid']?.toString() ??
+                                          auth.data['id']?.toString() ??
+                                          '',
+                                    );
                             if (response is ErrorResponse) {
-                              _messageProcess.setError(message: response.message);
+                              _messageProcess.setError(
+                                message: response.message,
+                              );
                             } else {
-                              _messageProcess.setSuccess(message: response.message);
+                              _messageProcess.setSuccess(
+                                message: response.message,
+                              );
                             }
                             _scheduleReset(_messageProcess);
                           },

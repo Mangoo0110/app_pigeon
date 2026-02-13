@@ -19,10 +19,7 @@ class AuthAccountTile extends StatelessWidget {
     return ListTile(
       title: Text(title),
       subtitle: subtitle == null ? null : Text(subtitle),
-      trailing: TextButton(
-        onPressed: onSwitch,
-        child: const Text('Switch'),
-      ),
+      trailing: TextButton(onPressed: onSwitch, child: const Text('Switch')),
     );
   }
 }

@@ -15,11 +15,7 @@ import '../../model/email_verification_request.dart';
 import '../../repo/auth_repository.dart';
 
 class EmailVerificationScreen extends StatefulWidget {
-  const EmailVerificationScreen({
-    this.userId,
-    this.showBack = true,
-    super.key,
-  });
+  const EmailVerificationScreen({this.userId, this.showBack = true, super.key});
 
   final String? userId;
   final bool showBack;
@@ -31,8 +27,9 @@ class EmailVerificationScreen extends StatefulWidget {
 
 class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
   final EmailVerificationFormState _form = EmailVerificationFormState();
-  final ProcessStatusNotifier processStatusNotifier =
-      ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: ProcessEnabled(message: ''),
+  );
   late final SnackbarNotifier snackbarNotifier;
 
   @override

@@ -1,4 +1,5 @@
 part of 'themes.dart';
+
 class AppSliderTheme {
   static SliderThemeData get lightTheme => SliderThemeData(
     thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 10),

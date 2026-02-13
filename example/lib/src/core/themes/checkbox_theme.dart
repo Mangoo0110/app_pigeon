@@ -8,9 +8,7 @@ class DCheckboxTheme {
     fillColor: WidgetStatePropertyAll(AppColors.light().buttonColor),
     checkColor: WidgetStatePropertyAll(AppColors.light().textColor),
     splashRadius: 20,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(4),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
   );
 
   // Dark CheckboxThemeData
@@ -18,8 +16,6 @@ class DCheckboxTheme {
     fillColor: WidgetStatePropertyAll(AppColors.dark().buttonColor),
     checkColor: WidgetStatePropertyAll(AppColors.dark().textColor),
     splashRadius: 20,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(4),
-    ),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
   );
 }

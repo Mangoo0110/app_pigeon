@@ -6,7 +6,10 @@ extension AuthExt on Authenticated {
   }
 
   String get userId {
-    return auth.data['uid'] ?? auth.data['user_id'] ?? auth.data['userId'] ?? auth.data['id'];
+    return auth.data['uid'] ??
+        auth.data['user_id'] ??
+        auth.data['userId'] ??
+        auth.data['id'];
   }
 
   String get userName {

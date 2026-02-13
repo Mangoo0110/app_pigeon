@@ -24,8 +24,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final ForgotPasswordFormState _form = ForgotPasswordFormState();
-  final ProcessStatusNotifier processStatusNotifier =
-      ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: ProcessEnabled(message: ''),
+  );
   late final SnackbarNotifier snackbarNotifier;
 
   @override
@@ -55,9 +56,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       onSuccessWithoutData: () {
         Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (_) => ResetPasswordScreen(
-              email: _form.emailController.text.trim(),
-            ),
+            builder: (_) =>
+                ResetPasswordScreen(email: _form.emailController.text.trim()),
           ),
         );
       },

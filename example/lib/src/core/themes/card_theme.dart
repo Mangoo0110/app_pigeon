@@ -9,11 +9,13 @@ class DCardTheme {
     //shadowColor: Colors.black.withOpacity(0.2), // Color of the shadow
     elevation: 4, // Elevation of the card
     margin: const EdgeInsets.symmetric(horizontal: 4), // Margin around the card
-    shape: RoundedRectangleBorder( // Shape of the card
+    shape: RoundedRectangleBorder(
+      // Shape of the card
       borderRadius: AppSizes.smallRectangleTileRadius,
     ),
     clipBehavior: Clip.antiAlias, // Clipping behavior of the card
-    surfaceTintColor: AppColors.light().backgroundColor, // Tint for Material 3 surfaces
+    surfaceTintColor:
+        AppColors.light().backgroundColor, // Tint for Material 3 surfaces
   );
 
   // Dark CardTheme
@@ -22,7 +24,8 @@ class DCardTheme {
     //shadowColor: Colors.white.withOpacity(0.4), // Color of the shadow
     elevation: 4, // Elevation of the card
     margin: const EdgeInsets.symmetric(horizontal: 0), // Margin around the card
-    shape: RoundedRectangleBorder( // Shape of the card
+    shape: RoundedRectangleBorder(
+      // Shape of the card
       borderRadius: AppSizes.smallRectangleTileRadius,
     ),
     clipBehavior: Clip.antiAlias, // Clipping behavior of the card

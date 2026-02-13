@@ -1,10 +1,7 @@
-
 import 'package:example/src/core/utils/extensions/textstyle_ext.dart';
 import 'package:flutter/material.dart';
 
-
 class SnackbarNotifier {
-
   BuildContext context;
   SnackbarNotifier({required this.context});
 
@@ -15,24 +12,31 @@ class SnackbarNotifier {
   }
 
   notifySuccess({String? message}) {
-    if(context.mounted && context.owner != null) {
+    if (context.mounted && context.owner != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        
-        content: Text(message ?? "Success", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular),
-        backgroundColor: Colors.black,
-        behavior: SnackBarBehavior.floating,
-        showCloseIcon: true,
-        margin: _snackBarMargin(context),
-      ),
-    );
+        SnackBar(
+          content: Text(
+            message ?? "Success",
+            maxLines: 3,
+            style: TextStyle(color: Colors.white).bold.regular,
+          ),
+          backgroundColor: Colors.black,
+          behavior: SnackBarBehavior.floating,
+          showCloseIcon: true,
+          margin: _snackBarMargin(context),
+        ),
+      );
     }
   }
 
   notify({String? message, double fontSize = 16}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message ?? "", maxLines: 3, style: TextStyle(color: Colors.white, fontSize: fontSize).bold),
+        content: Text(
+          message ?? "",
+          maxLines: 3,
+          style: TextStyle(color: Colors.white, fontSize: fontSize).bold,
+        ),
         backgroundColor: Colors.black,
         behavior: SnackBarBehavior.floating,
         showCloseIcon: true,
@@ -42,19 +46,22 @@ class SnackbarNotifier {
   }
 
   notifyError({String? message}) {
-    if(context.mounted && context.owner != null) {
+    if (context.mounted && context.owner != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message ?? "Error", maxLines: 3, style: TextStyle(color: Colors.white).bold.regular,),
-        behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.red,
-        showCloseIcon: true,
-        margin: _snackBarMargin(context),
-      ),
-    );
+        SnackBar(
+          content: Text(
+            message ?? "Error",
+            maxLines: 3,
+            style: TextStyle(color: Colors.white).bold.regular,
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.red,
+          showCloseIcon: true,
+          margin: _snackBarMargin(context),
+        ),
+      );
     }
   }
-
 }
 
 // class _AnimatedSnackbar extends StatefulWidget {
@@ -152,7 +159,7 @@ class SnackbarNotifier {
 //                               ],
 //                             ).h6.w600,
 //                           ),
-                        
+
 //                         ],
 //                       ),
 //                     ),

@@ -33,10 +33,7 @@ class ProfileRepoImpl extends ProfileRepository {
   AsyncRequest<void> updateProfile(UpdateProfileRequest request) {
     return asyncTryCatch(
       tryFunc: () async {
-        await appPigeon.patch(
-          ApiEndpoints.userProfile,
-          data: request.toJson(),
-        );
+        await appPigeon.patch(ApiEndpoints.userProfile, data: request.toJson());
         return SuccessResponse<void>(data: null, message: 'Profile updated.');
       },
     );

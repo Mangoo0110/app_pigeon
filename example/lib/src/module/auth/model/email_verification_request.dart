@@ -15,10 +15,7 @@ class EmailVerificationRequest {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'user_id': userId,
-      'verification_code': verificationCode,
-    };
+    return {'user_id': userId, 'verification_code': verificationCode};
   }
 
   EmailVerificationRequest copyWith({

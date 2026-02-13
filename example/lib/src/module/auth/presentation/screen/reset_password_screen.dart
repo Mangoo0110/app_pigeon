@@ -16,10 +16,7 @@ import '../../model/reset_password_request.dart';
 import '../../repo/auth_repository.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
-  const ResetPasswordScreen({
-    this.email,
-    super.key,
-  });
+  const ResetPasswordScreen({this.email, super.key});
 
   final String? email;
 
@@ -29,8 +26,9 @@ class ResetPasswordScreen extends StatefulWidget {
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   final ResetPasswordFormState _form = ResetPasswordFormState();
-  final ProcessStatusNotifier processStatusNotifier =
-      ProcessStatusNotifier(initialStatus: ProcessEnabled(message: ''));
+  final ProcessStatusNotifier processStatusNotifier = ProcessStatusNotifier(
+    initialStatus: ProcessEnabled(message: ''),
+  );
   late final SnackbarNotifier snackbarNotifier;
 
   @override

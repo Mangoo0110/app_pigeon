@@ -79,20 +79,14 @@ class ChatRepoImpl extends ChatRepository {
           ...message.toJson(),
           'message': message.text,
           'sentAt': DateTime.now().toIso8601String(),
-          'sender': <String, dynamic>{
-            'id': senderId,
-            'name': senderName,
-          },
+          'sender': <String, dynamic>{'id': senderId, 'name': senderName},
         };
         if (_isGhostMode) {
           payload['ghostId'] = senderId;
         }
 
         _appPigeon.emit(_messageChannel, payload);
-        return SuccessResponse<void>(
-          data: null,
-          message: 'Message sent.',
-        );
+        return SuccessResponse<void>(data: null, message: 'Message sent.');
       },
     );
   }

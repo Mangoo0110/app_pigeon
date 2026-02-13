@@ -16,11 +16,7 @@ class ChatMessage with _$ChatMessage {
   @override
   final DateTime sentAt;
 
-  ChatMessage({
-    required this.sender,
-    required this.text,
-    required this.sentAt,
-  });
+  ChatMessage({required this.sender, required this.text, required this.sentAt});
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) =>
       _$ChatMessageFromJson(json);
