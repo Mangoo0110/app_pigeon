@@ -37,7 +37,7 @@ class UniversalChatPanel extends StatelessWidget {
                       final message = messages[index];
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4),
-                        child: Text("${message.sender.name}: ${message.text}"),
+                        child: Text("${message.sender.name}: ${message.text}", maxLines: 20,),
                       );
                     },
                   ),

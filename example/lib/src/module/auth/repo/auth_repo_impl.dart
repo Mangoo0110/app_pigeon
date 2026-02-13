@@ -82,7 +82,7 @@ class AuthRepoImpl extends AuthRepository{
   @override
   AsyncRequest<void> logout() async {
     return asyncTryCatch(tryFunc: () async {
-      await appPigeon.post(ApiEndpoints.logout);
+      await appPigeon.logOut();
       return SuccessResponse<void>(data: null, message: 'You are now logged out!');
     });
   }
