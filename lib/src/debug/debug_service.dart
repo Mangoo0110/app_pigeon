@@ -4,7 +4,7 @@ part 'debugger.dart';
 enum DebugLabel {
   ui("UI"),
   controller("Controller"),
-  authService("AuthService"),
+  pigeonService("PigeonService"),
   authStorage("AuthStorage"),
   apiCall("ApiCall"),
   socketService("SocketService"); 

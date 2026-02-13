@@ -1,47 +1,27 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:app_pigeon/src/auth/interface/auth_storage_interface.dart';
+import 'package:app_pigeon/src/interface/authorization.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:socket_io_client/socket_io_client.dart' as io;
+import 'interface/app_pigeon.dart';
 import 'auth/interface/current_auth_uid_manager_interface.dart';
 import 'debug/debug_service.dart';
+import 'error_handler/pigeon_error_handler.dart';
 import 'params/socket_connect_param.dart';
 import 'refresh_token_manager.dart';
+import 'socket/socket_service.dart';
 part 'auth/auth.dart';
 part 'auth/auth_status.dart';
 part 'auth/auth_storage.dart';
-part 'socket/socket_service.dart';
 part 'params/auth_params.dart';
 part 'network/api_call_interceptor.dart';
 
-mixin class _ErrorHandler {
-  Future<T?> runGuarded<T>(
-    Future<T> Function() action, {
-    void Function(Object error, StackTrace stack)? onError,
-    bool rethrowError = false,
-  }) async {
-    try {
-      return await action();
-    } catch (e, stack) {
-      if (onError != null) {
-        onError(e, stack);
-      }
-
-      if (rethrowError) {
-        rethrow;
-      }
-
-      return null;
-    }
-  }
-}
 
 
-
-class AppPigeon with _ErrorHandler {
-  AppPigeon(
+class AuthorizedPigeon with PigeonErrorHandler implements AppPigeon, Authorization {
+  AuthorizedPigeon(
     this.refreshTokenManager, {
     int connectTimeout = 15000, // milliseconds
     int receiveTimeout = 15000, // milliseconds
@@ -49,7 +29,7 @@ class AppPigeon with _ErrorHandler {
     this.onError,
     this.allowOnly = const {
       DebugLabel.apiCall,
-      DebugLabel.authService,
+      DebugLabel.pigeonService,
       DebugLabel.authStorage,
       DebugLabel.socketService
     },
@@ -92,17 +72,26 @@ class AppPigeon with _ErrorHandler {
   }
   
 
-  dispose() {
+  @override
+  void dispose() {
     _authStorage.dispose();
-    _socketService._disposeSocket();
+    _socketService.dispose();
   }
 
+  /// Disconnects socket listeners/connection without touching auth storage.
+  void disconnectSocket() {
+    _socketService.dispose();
+  }
+
+  @override
   Stream<AuthStatus> get authStream => _authStorage.authStream;
 
+  @override
   Future<void> saveNewAuth({required SaveNewAuthParams saveAuthParams}) async {
     await _authStorage.saveNewAuth(saveAuthParams);
   }
 
+  @override
   Future<void> updateCurrentAuth({
     required UpdateAuthParams updateAuthParams,
   }) async {
@@ -110,28 +99,33 @@ class AppPigeon with _ErrorHandler {
   }
 
   /// Returns the current auth record stored.
+  @override
   Future<Auth?> getCurrentAuthRecord() async {
     return await _authStorage.getCurrentAuth();
   }
 
   /// Returns all saved separate auth records that are stored locally.
+  @override
   Future<List<Auth>> getAllAuthRecords() async {
     return await _authStorage.getAllAuth();
   }
 
   /// This will remove the current auth reference and data stored locally.
+  @override
   Future<void> logOut() async {
     await _authStorage.clearCurrentAuthRecord();
   }
 
   /// Switches current auth by uid.
+  @override
   Future<void> switchAccount({required String uid}) async {
-    await _authStorage.switchCurrentAuth(uid: uid);
+    await _authStorage.switchAccount(uid: uid);
   }
 
   // Public GET/POST/PUT/DELETE [DIO] wrappers
 
   /// ### GET
+  @override
   Future<Response> get(
     String path, {
     dynamic data,
@@ -147,6 +141,7 @@ class AppPigeon with _ErrorHandler {
   }
 
   /// ### POST
+  @override
   Future<Response> post(String path, {
     dynamic data, 
     Options? options,  
@@ -167,6 +162,7 @@ class AppPigeon with _ErrorHandler {
   }
 
   /// ### PUT
+  @override
   Future<Response> put(String path, {
     dynamic data, 
     Options? options,  
@@ -185,6 +181,7 @@ class AppPigeon with _ErrorHandler {
   }
 
   /// ### PATCH
+  @override
   Future<Response> patch(String path, {
     dynamic data,
     Options? options,
@@ -203,6 +200,7 @@ class AppPigeon with _ErrorHandler {
   }
 
   /// ### DELETE
+  @override
   Future<Response> delete(
     String path, {
     dynamic data,
@@ -224,14 +222,12 @@ class AppPigeon with _ErrorHandler {
   /// If no current auth record is found, socket will not be initialized.
   /// 
   /// ### NOTE:: If you want to see debug logs from socket service,
-  /// ### make sure to add [DebugLabel.socketService] to the [allowOnly] set, while setting up your [AppPigeon]
+  /// ### make sure to add [DebugLabel.socketService] to the [allowOnly] set, while setting up your [AuthorizedPigeon]
+  @override
   Future<void> socketInit(SocketConnetParamX param) async {
     final token =
         param.token ??
         (await _authStorage.getCurrentAuth())?._accessToken;
-    if (token == null) {
-      return;
-    }
     final socketConnectParam = SocketConnectParam(
       url: param.socketUrl,
       token: token,
@@ -241,6 +237,7 @@ class AppPigeon with _ErrorHandler {
   }
 
   /// Listen to socket event
+  @override
   Stream<dynamic> listen(String channelName) {
     return _socketService.listen(channelName);
   }
@@ -253,6 +250,7 @@ class AppPigeon with _ErrorHandler {
   /// 2. Emitting a chat message
   /// 3. Emitting a typing indicator
   /// ... etc
+  @override
   void emit(String eventName, [dynamic data]) {
     _socketService.emit(eventName, data);
   }

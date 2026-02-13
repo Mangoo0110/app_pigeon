@@ -1,4 +1,4 @@
-import '../../app_pigeon.dart';
+import '../../authorized_pigeon.dart';
 
 abstract interface class AuthStorageInterface {
   /* ───────── Lifecycle ───────── */
@@ -32,5 +32,5 @@ abstract interface class AuthStorageInterface {
   Future<void> clearCurrentAuthRecord();
 
   /// Switches current auth by uid
-  Future<void> switchCurrentAuth({required String uid});
+  Future<void> switchAccount({required String uid});
 }
