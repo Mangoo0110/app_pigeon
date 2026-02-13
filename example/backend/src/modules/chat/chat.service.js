@@ -1,10 +1,11 @@
 import crypto from "crypto";
+import bcrypt from "bcrypt";
 import User from "../user/user.model.js";
 import ChatMessage from "./chat.model.js";
 import Ghost from "./ghost.model.js";
 import AppError from "../../shared/errors/app_error.js";
 
-const GHOST_ID_REGEX = /^ghost_[a-z0-9_-]{4,64}$/;
+const GHOST_USERNAME_REGEX = /^[a-z0-9_]{3,24}$/;
 
 const toChatPayload = (doc) => {
   const createdAt = doc.createdAt ? new Date(doc.createdAt) : new Date();
@@ -28,6 +29,8 @@ const toChatPayload = (doc) => {
 };
 
 const normalizeGhostId = (value) => String(value || "").trim().toLowerCase();
+const normalizeGhostUserName = (value) =>
+  String(value || "").trim().toLowerCase();
 
 const buildGhostName = (ghostId, fallbackName) => {
   const name = String(fallbackName || "").trim();
@@ -36,51 +39,127 @@ const buildGhostName = (ghostId, fallbackName) => {
   return `Ghost ${tail}`;
 };
 
-const generateGhostId = () => `ghost_${crypto.randomBytes(8).toString("hex")}`;
+const generatePasskey = () =>
+  crypto
+    .randomBytes(4)
+    .toString("base64")
+    .replace(/[^a-zA-Z0-9]/g, "")
+    .slice(0, 6)
+    .toUpperCase();
 
-const findOrCreateGhostById = async (ghostId) => {
-  const normalized = normalizeGhostId(ghostId);
-  if (!normalized || !GHOST_ID_REGEX.test(normalized)) {
+const ghostIdFromUserName = (userName) => `ghost_${userName}`;
+
+const ghostPublicPayload = (ghost) => ({
+  ghostId: ghost.ghostId,
+  userName: ghost.userName,
+  displayName: ghost.displayName || ghost.userName,
+});
+
+export const checkGhostUserNameAvailability = async ({ userName }) => {
+  const normalizedUserName = normalizeGhostUserName(userName);
+  if (!normalizedUserName || !GHOST_USERNAME_REGEX.test(normalizedUserName)) {
     throw new AppError(
       400,
-      "Invalid ghostId format. Expected something like ghost_ab12cd34"
+      "Invalid username format. Use 3-24 chars with lowercase letters, numbers, and underscore."
     );
   }
 
-  const existing = await Ghost.findOneAndUpdate(
-    { ghostId: normalized },
-    { $set: { lastSeenAt: new Date() } },
-    { new: true }
-  );
-  if (existing) {
-    return { ghost: existing, exists: true };
+  const ghostId = ghostIdFromUserName(normalizedUserName);
+  const exists = await Ghost.exists({ ghostId });
+  return {
+    userName: normalizedUserName,
+    ghostId,
+    available: !exists,
+  };
+};
+
+export const registerGhostIdentity = async ({ userName }) => {
+  const normalizedUserName = normalizeGhostUserName(userName);
+  if (!normalizedUserName || !GHOST_USERNAME_REGEX.test(normalizedUserName)) {
+    throw new AppError(
+      400,
+      "Invalid username format. Use 3-24 chars with lowercase letters, numbers, and underscore."
+    );
   }
 
-  const created = await Ghost.create({ ghostId: normalized, lastSeenAt: new Date() });
-  return { ghost: created, exists: false };
+  const existing = await Ghost.findOne({ userName: normalizedUserName });
+  if (existing) {
+    throw new AppError(409, "Ghost username already exists");
+  }
+
+  const ghostId = ghostIdFromUserName(normalizedUserName);
+  const passkey = generatePasskey();
+  const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
+  const passkeyHash = await bcrypt.hash(passkey, saltRounds);
+
+  const created = await Ghost.create({
+    ghostId,
+    userName: normalizedUserName,
+    passkeyHash,
+    displayName: normalizedUserName,
+    lastSeenAt: new Date(),
+  });
+
+  return {
+    ...ghostPublicPayload(created),
+    passkey,
+    isNew: true,
+  };
+};
+
+export const loginGhostIdentity = async ({ userName, passkey }) => {
+  const normalizedUserName = normalizeGhostUserName(userName);
+  const normalizedPasskey = String(passkey || "").trim().toUpperCase();
+  if (!normalizedUserName || !normalizedPasskey) {
+    throw new AppError(400, "username and passkey are required");
+  }
+
+  const ghost = await Ghost.findOne({ userName: normalizedUserName }).select(
+    "+passkeyHash"
+  );
+  if (!ghost) {
+    throw new AppError(404, "Ghost identity not found");
+  }
+
+  const isValidPasskey = await bcrypt.compare(normalizedPasskey, ghost.passkeyHash);
+  if (!isValidPasskey) {
+    throw new AppError(401, "Invalid ghost passkey");
+  }
+
+  ghost.lastSeenAt = new Date();
+  await ghost.save();
+
+  return {
+    ...ghostPublicPayload(ghost),
+    isNew: false,
+  };
 };
 
 export const resolveGhostSession = async ({ ghostId }) => {
   const normalized = normalizeGhostId(ghostId);
   if (normalized) {
-    const { ghost, exists } = await findOrCreateGhostById(normalized);
-    return { ghostId: ghost.ghostId, exists };
+    const ghost = await Ghost.findOneAndUpdate(
+      { ghostId: normalized },
+      { $set: { lastSeenAt: new Date() } },
+      { new: true }
+    );
+    return { ghostId: normalized, exists: Boolean(ghost) };
   }
 
-  let generated = generateGhostId();
-  while (await Ghost.exists({ ghostId: generated })) {
-    generated = generateGhostId();
-  }
-  await Ghost.create({ ghostId: generated, lastSeenAt: new Date() });
-  return { ghostId: generated, exists: false };
+  return { ghostId: null, exists: false };
 };
 
 const resolveSender = async ({ userId, sender, identityType, ghostId }) => {
   const fallbackSender = sender && typeof sender === "object" ? sender : {};
   if (identityType === "ghost") {
+    const ghost = ghostId ? await Ghost.findOne({ ghostId }) : null;
+    const ghostName =
+      String(ghost?.displayName || "").trim() ||
+      String(ghost?.userName || "").trim() ||
+      buildGhostName(ghostId || "ghost_anon", fallbackSender.name);
     return {
       id: ghostId || fallbackSender.id || "unknown",
-      name: buildGhostName(ghostId || "ghost_anon", fallbackSender.name),
+      name: ghostName,
       profileImage: fallbackSender.profileImage || null,
     };
   }
@@ -123,6 +202,9 @@ export const createMessage = async ({
   let resolvedGhostId = null;
   if (identityType === "ghost") {
     const ghostSession = await resolveGhostSession({ ghostId });
+    if (!ghostSession.exists || !ghostSession.ghostId) {
+      throw new AppError(401, "Ghost identity not logged in or does not exist");
+    }
     resolvedGhostId = ghostSession.ghostId;
   } else if (!userId) {
     throw new AppError(401, "Not authenticated");
