@@ -9,7 +9,7 @@ import '../model/sender/sender.dart';
 import 'chat_repository.dart';
 
 class ChatRepoImpl extends ChatRepository {
-  ChatRepoImpl(this.appPigeon);
+  ChatRepoImpl(this._appPigeonResolver);
 
   final AppPigeon Function() _appPigeonResolver;
   AppPigeon get _appPigeon => _appPigeonResolver();
@@ -23,7 +23,7 @@ class ChatRepoImpl extends ChatRepository {
   AsyncRequest<void> connectToUniversalChat({String joinId = 'global_chat'}) {
     return asyncTryCatch(
       tryFunc: () async {
-        await appPigeon.socketInit(
+        await _appPigeon.socketInit(
           SocketConnetParamX(
             token: null,
             socketUrl: ApiEndpoints.socketUrl,
@@ -39,8 +39,33 @@ class ChatRepoImpl extends ChatRepository {
   }
 
   @override
+  AsyncRequest<List<ChatMessage>> fetchPreviousMessages({int limit = 50}) {
+    return asyncTryCatch(
+      tryFunc: () async {
+        final endpoint = _isGhostMode
+            ? ApiEndpoints.ghostChatMessages
+            : ApiEndpoints.chatMessages;
+        final response = await _appPigeon.get(
+          endpoint,
+          queryParameters: <String, dynamic>{'limit': limit},
+        );
+        final body = extractBodyData(response);
+        final items = body is List ? body : <dynamic>[];
+        final messages = items
+            .whereType<Map<String, dynamic>>()
+            .map(_parseSocketMessage)
+            .toList(growable: false);
+        return SuccessResponse<List<ChatMessage>>(
+          data: messages,
+          message: 'Messages loaded.',
+        );
+      },
+    );
+  }
+
+  @override
   Stream<ChatMessage> get messageStream =>
-      appPigeon.listen(_messageChannel).map(_parseSocketMessage);
+      _appPigeon.listen(_messageChannel).map(_parseSocketMessage);
 
   @override
   AsyncRequest<void> sendMessage(
@@ -50,7 +75,7 @@ class ChatRepoImpl extends ChatRepository {
   }) {
     return asyncTryCatch(
       tryFunc: () async {
-        appPigeon.emit(_messageChannel, <String, dynamic>{
+        final payload = <String, dynamic>{
           ...message.toJson(),
           'message': message.text,
           'sentAt': DateTime.now().toIso8601String(),
@@ -58,7 +83,12 @@ class ChatRepoImpl extends ChatRepository {
             'id': senderId,
             'name': senderName,
           },
-        });
+        };
+        if (_isGhostMode) {
+          payload['ghostId'] = senderId;
+        }
+
+        _appPigeon.emit(_messageChannel, payload);
         return SuccessResponse<void>(
           data: null,
           message: 'Message sent.',

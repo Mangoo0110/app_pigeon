@@ -1,66 +1,123 @@
-A simple auth-aware networking layer for Flutter apps.
-Built on top of **Dio** and **flutter_secure_storage**.
+# app_pigeon
 
-**AppPigeon** takes care of **authenticated HTTP requests** so you don’t have to manually manage tokens, headers, and refresh logic.
+`app_pigeon` is a Flutter networking and socket layer with two operation modes:
 
----
+1. `AuthorizedPigeon`: token-based HTTP + auth persistence + refresh flow.
+2. `GhostPigeon`: lightweight HTTP + socket client for anonymous/guest/ghost use cases.
 
-## Features
+The package exposes a shared `AppPigeon` interface so app code can depend on one contract while switching implementations at runtime. It acts as your reusable API client foundation, instead of rebuilding the same networking layer from scratch for every new REST API project.
 
-- Automatically attaches auth headers to every request  
-- Securely stores access & refresh tokens  
-- Refreshes tokens when they expire  
-- Keeps authentication state in sync across the app  
-- Handles logout and auth cleanup correctly  
-- Re-authenticates socket connections using the active auth token 
+## Capabilities
 
-## Basic Usage
+1. Typed HTTP wrappers over `dio`:
+   - `get`, `post`, `put`, `patch`, `delete`
+2. Realtime socket API:
+   - `socketInit`, `listen`, `emit`
+3. Authorized mode auth persistence:
+   - secure local auth storage via `flutter_secure_storage`
+   - multiple account records
+   - current-account switching
+   - auth stream updates
+4. Authorized mode auto-refresh:
+   - interceptor-driven refresh flow on unauthorized responses
+   - refresh request queueing + replay of pending requests
+5. Ghost mode optional bearer support:
+   - ghost interceptor can attach bearer if you call `setAuthToken(...)`
 
-### Constructor
+## Install
+
+Add to `pubspec.yaml`:
+
+```yaml
+dependencies:
+  app_pigeon: ^<latest>
+```
+
+## Exports
+
+`package:app_pigeon/app_pigeon.dart` exports:
+
+1. `AppPigeon` (interface)
+2. `AuthorizedPigeon`
+3. `GhostPigeon`
+4. `SocketConnetParamX`
+5. `RefreshTokenManagerInterface`, `RefreshTokenResponse`
+6. `dio` types
+7. `flutter_secure_storage` types
+
+## Core Types
+
+### `AppPigeon` interface
+
+The shared contract:
+
+1. `Future<Response> get/post/put/patch/delete(...)`
+2. `Future<void> socketInit(SocketConnetParamX param)`
+3. `Stream<dynamic> listen(String channelName)`
+4. `void emit(String eventName, [dynamic data])`
+5. `void dispose()`
+
+### `SocketConnetParamX`
+
 ```dart
-import 'package:apppigeon/apppigeon.dart';
-
-// Implement the RefreshTokenManagerInterface
-class MyRefreshTokenManager implements RefreshTokenManagerInterface {
-  @override
-  Future<RefreshTokenResponse> refreshToken(String refreshToken) async {
-    // Your logic to call the refresh token API...
-    final response = await Dio().post(
-        'https://api.example.com/refresh',
-        data: {'refreshToken': refreshToken},
-        );
-    final data = response.data["data"];
-    return RefreshTokenResponse(
-        accessToken: data["accessToken"], 
-        refreshToken: data["refreshToken"],
-        data: (data["userId"] != null) ? 
-            {
-            "userId": data["userId"],
-            } : null
-        );
-
-  }
-}
-
-// Create an instance of AppPigeon
-void main() {
-  final refreshTokenManager = MyRefreshTokenManager();
-
-  final appPigeon = AppPigeon(
-    refreshTokenManager,
-    baseUrl: 'https://api.example.com',
-    onError: (error, stack) {
-      print('AppPigeon error: $error');
-      print(stack);
-    },
-  );
+class SocketConnetParamX {
+  final String? token;
+  final String socketUrl;
+  final String joinId;
 }
 ```
 
-### Login and save auth
+`token` is optional. In authorized mode, if `token` is `null`, current stored auth token is used.
+
+## Authorized Mode
+
+Use `AuthorizedPigeon` when your API requires authentication and token refresh.
+
+### Setup
 
 ```dart
-await appPigeon.saveNewAuth(
+import 'package:app_pigeon/app_pigeon.dart';
+
+class MyRefreshTokenManager implements RefreshTokenManagerInterface {
+  @override
+  final String url = '/auth/refresh';
+
+  @override
+  Future<bool> shouldRefresh(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
+    return err.response?.statusCode == 401;
+  }
+
+  @override
+  Future<RefreshTokenResponse> refreshToken({
+    required String refreshToken,
+    required Dio dio,
+  }) async {
+    final res = await dio.post(
+      url,
+      data: {'refreshToken': refreshToken},
+    );
+    final data = res.data['data'] as Map<String, dynamic>;
+    return RefreshTokenResponse(
+      accessToken: data['accessToken'] as String,
+      refreshToken: data['refreshToken'] as String,
+      data: data,
+    );
+  }
+}
+
+final authorized = AuthorizedPigeon(
+  MyRefreshTokenManager(),
+  baseUrl: 'https://api.example.com',
+);
+```
+
+### Save login auth
+
+```dart
+await authorized.saveNewAuth(
   saveAuthParams: SaveNewAuthParams(
     uid: userId,
     accessToken: accessToken,
@@ -70,37 +127,198 @@ await appPigeon.saveNewAuth(
 );
 ```
 
-### Listen to auth state change
+### Listen auth state
 
 ```dart
-appPigeon.authStream.listen((status) {
+authorized.authStream.listen((status) {
   if (status is Authenticated) {
-    // user logged in
+    // signed in
   } else if (status is UnAuthenticated) {
-    // user logged out
+    // signed out
   }
 });
 ```
 
-### Make authorized requests
+### Account operations
+
 ```dart
-final response = await appPigeon.get('/profile');
+final current = await authorized.getCurrentAuthRecord();
+final all = await authorized.getAllAuthRecords();
+await authorized.switchAccount(uid: 'user_2');
+await authorized.logOut();
 ```
 
-### Socket usage
-Initialize socket
+### Socket in authorized mode
+
 ```dart
-await appPigeon.socketInit(
+await authorized.socketInit(
   SocketConnetParamX(
+    token: null, // use stored token
     socketUrl: 'https://socket.example.com',
-    joinId: 'room_1',
+    joinId: 'global_chat',
+  ),
+);
+
+authorized.listen('message').listen((event) {
+  // handle incoming message
+});
+
+authorized.emit('message', {'text': 'hello'});
+```
+
+### Lifecycle notes
+
+1. `dispose()` closes auth storage stream and socket.
+2. If you only want to stop socket and keep auth storage alive, use:
+   - `authorized.disconnectSocket()`
+
+## Ghost Mode
+
+Use `GhostPigeon` for anonymous/ghost flows where full auth persistence is not needed.
+
+### Setup
+
+```dart
+final ghost = GhostPigeon(
+  baseUrl: 'https://api.example.com',
+);
+```
+
+### Optional token
+
+```dart
+ghost.setAuthToken('optional_token');
+```
+
+If set, ghost interceptor attaches `Authorization: Bearer <token>` on requests.
+
+### HTTP and socket usage
+
+```dart
+final res = await ghost.post(
+  '/chat/ghost/register',
+  data: {'userName': 'ghostfox'},
+);
+
+await ghost.socketInit(
+  SocketConnetParamX(
+    token: null,
+    socketUrl: 'https://socket.example.com',
+    joinId: 'ghost_room',
+  ),
+);
+
+ghost.listen('ghost_message').listen((event) {
+  // handle ghost messages
+});
+
+ghost.emit('ghost_message', {
+  'ghostId': 'ghost_ghostfox',
+  'text': 'hello from ghost',
+});
+```
+
+### Lifecycle notes
+
+1. `dispose()` closes ghost socket resources.
+2. If you only want to explicitly stop socket listeners/connection, use:
+   - `ghost.disconnectSocket()`
+
+## Dynamic Mode Switching
+
+Common architecture in apps:
+
+1. Keep one `AuthorizedPigeon`.
+2. Keep one `GhostPigeon`.
+3. Expose an app-level active resolver.
+4. Repositories call the currently active client at runtime.
+
+This pattern lets you switch seamlessly between:
+
+1. authenticated identity
+2. ghost identity
+
+without rebuilding repository objects.
+
+## Error Handling Behavior
+
+### Authorized interceptor
+
+1. Appends access token from current stored auth.
+2. On configured unauthorized errors:
+   - starts one refresh request
+   - queues pending failed requests
+   - updates auth storage with new tokens
+   - retries queued requests
+3. If refresh fails:
+   - clears current auth
+   - rejects queued requests
+
+### Ghost interceptor
+
+1. Attaches optional token if set.
+2. Does not run refresh flow.
+
+## Recommended Backend Contract
+
+For best compatibility, backend should return refreshed tokens as:
+
+```json
+{
+  "data": {
+    "accessToken": "new_access",
+    "refreshToken": "new_refresh"
+  }
+}
+```
+
+For ghost identity flows, typical endpoints:
+
+1. `POST /chat/ghost/register`
+2. `POST /chat/ghost/login`
+3. `POST /chat/ghost/messages`
+4. `GET /chat/ghost/messages`
+
+## Minimal End-to-End Example
+
+```dart
+final authorized = AuthorizedPigeon(
+  MyRefreshTokenManager(),
+  baseUrl: 'https://api.example.com',
+);
+final ghost = GhostPigeon(baseUrl: 'https://api.example.com');
+
+// Use authorized client
+await authorized.post('/auth/login', data: {...});
+await authorized.saveNewAuth(
+  saveAuthParams: SaveNewAuthParams(
+    uid: 'u1',
+    accessToken: 'a1',
+    refreshToken: 'r1',
+    data: {'uid': 'u1'},
+  ),
+);
+
+// Later switch to ghost flow
+authorized.disconnectSocket();
+final ghostSession = await ghost.post(
+  '/chat/ghost/register',
+  data: {'userName': 'ghostfox'},
+);
+await ghost.socketInit(
+  SocketConnetParamX(
+    token: null,
+    socketUrl: 'https://socket.example.com',
+    joinId: 'ghost_room',
   ),
 );
 ```
 
-### Listen to socket event
-```dart
-appPigeon.listen('message').listen((data) {
-  // handle incoming message
-});
-```
+## Example App
+
+This repository includes an `example/` app and example backend showing:
+
+1. authorized login/signup/refresh
+2. multi-account switching
+3. ghost identity flow
+4. realtime universal chat

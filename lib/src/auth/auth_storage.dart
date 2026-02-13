@@ -1,4 +1,4 @@
-part of '../authorized_app_pigeon.dart';
+part of '../authorized_pigeon.dart';
 
 class _AuthStatusDecider {
   static AuthStatus get(Auth? auth) {

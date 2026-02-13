@@ -1,4 +1,4 @@
-part of '../ghost_app_pigeon.dart';
+part of '../ghost_pigeon.dart';
 
 
 class GhostApiCallInterceptor extends Interceptor{
