@@ -11,8 +11,8 @@ class Debugger {
   }
 }
 
-class AuthServiceDebugger extends Debugger {
-  AuthServiceDebugger() : super(debugLabel: DebugLabel.authService);
+class PigeonServiceDebugger extends Debugger {
+  PigeonServiceDebugger() : super(debugLabel: DebugLabel.pigeonService);
 }
 
 class AuthStorageDebugger extends Debugger {

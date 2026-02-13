@@ -1,4 +1,4 @@
-part of '../app_pigeon.dart';
+part of '../authorized_app_pigeon.dart';
 
 class _PendingRequest {
   _PendingRequest({
@@ -133,8 +133,8 @@ class ApiCallInterceptor extends Interceptor{
     } catch (e, s) {
       // Refresh failed: force unauthenticated state and fail all queued requests.
       _debugger.dekhao('Refresh failed. Rejecting queued requests: $e');
-      debugPrint(e.toString());
-      debugPrint(s.toString());
+      _debugger.dekhao(e.toString());
+      _debugger.dekhao(s.toString());
       await _authStorage.clearCurrentAuthRecord();
       _rejectPendingRequests(e);
     } finally {

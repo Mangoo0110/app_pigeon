@@ -1,5 +1,3 @@
-part of '../app_pigeon.dart';
-
 enum SocketRequestType {
   connect, emit, disconnect;
 
