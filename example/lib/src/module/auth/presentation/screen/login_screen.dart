@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/component/reactive_notifier/snackbar_notifier.dart';
+import '../../../../core/di/service_locator.dart';
 import '../../../../core/utils/debug/debug_service.dart';
-import 'package:example/src/core/di/service_locator.dart';
-import 'package:example/src/core/utils/helpers/handle_future_request.dart';
-import 'package:example/src/module/auth/repo/auth_repository.dart';
+import '../../../../core/utils/helpers/handle_future_request.dart';
 import '../../model/login_request.dart';
+import '../../repo/auth_repository.dart';
 import '../state/auth_form_states.dart';
 import '../state/auth_validators.dart';
 import '../widget/auth_link_button.dart';

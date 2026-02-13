@@ -13,13 +13,19 @@ import '../../module/profile/repo/profile_repository.dart';
 final GetIt serviceLocator = GetIt.instance;
 
 Future<void> setupServiceLocator() async{
-  final appPigeon = AppPigeon(
+  final AuthorizedAppPigeon authorizedPigeon = AuthorizedAppPigeon(
     MyRefreshTokenManager(),
     baseUrl: ApiEndpoints.baseUrl,
   );
-  serviceLocator.registerSingleton<AppPigeon>(appPigeon);
-  serviceLocator.registerSingleton<AuthRepository>(AuthRepoImpl(appPigeon));
-  serviceLocator.registerSingleton<ChatRepository>(ChatRepoImpl(appPigeon));
-  serviceLocator.registerSingleton<ProfileRepository>(ProfileRepoImpl(appPigeon));
+
+  final GhostAppPigeon ghostPigeon = GhostAppPigeon(
+    baseUrl: ApiEndpoints.baseUrl
+  );
+
+  serviceLocator.registerSingleton<AppPigeon>(authorizedPigeon);
+  serviceLocator.registerSingleton<GhostAppPigeon>(ghostPigeon);
+  serviceLocator.registerSingleton<AuthRepository>(AuthRepoImpl(authorizedPigeon));
+  serviceLocator.registerSingleton<ChatRepository>(ChatRepoImpl(authorizedPigeon));
+  serviceLocator.registerSingleton<ProfileRepository>(ProfileRepoImpl(authorizedPigeon));
 
 }

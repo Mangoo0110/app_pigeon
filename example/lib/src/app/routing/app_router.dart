@@ -1,10 +1,9 @@
 
-
-import 'package:example/src/module/auth/presentation/screen/login_screen.dart';
-import 'package:example/src/module/auth/presentation/screen/signup_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../main.dart';
 import '../../module/auth/model/authenticated_user.dart';
+import '../../module/auth/presentation/screen/login_screen.dart';
+import '../../module/auth/presentation/screen/signup_screen.dart';
 import '../view/authenticated_home_screen.dart';
 import 'route_names.dart';
 

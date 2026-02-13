@@ -14,7 +14,7 @@ import 'package:flutter/material.dart';
 
 class AuthRepoImpl extends AuthRepository{
 
-  final AppPigeon appPigeon;
+  final AuthorizedAppPigeon appPigeon;
 
   AuthRepoImpl(this.appPigeon);
 
