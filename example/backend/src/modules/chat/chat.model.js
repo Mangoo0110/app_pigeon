@@ -14,6 +14,8 @@ const chatMessageSchema = new Schema(
     text: { type: String, required: true, trim: true, maxlength: 2000 },
     sender: { type: senderSchema, required: true },
     userId: { type: Schema.Types.ObjectId, ref: "User", default: null, index: true },
+    ghostId: { type: String, default: null, index: true },
+    identityType: { type: String, enum: ["user", "ghost"], default: "user", index: true },
     source: { type: String, enum: ["api", "socket"], default: "api" },
   },
   { timestamps: true }

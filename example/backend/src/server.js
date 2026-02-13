@@ -10,7 +10,7 @@ const PORT = Number(process.env.PORT || 3000);
 const MONGO_URI = process.env.MONGO_URI || "";
 
 if (MONGO_URI) {
-  console.log("MONGO_URI:", MONGO_URI);
+  console.log("MONGO_URI is set");
   mongoose
     .connect(MONGO_URI)
     .then(() => {
@@ -61,16 +61,40 @@ io.on("connection", (socket) => {
 
   socket.on("message", async (payload = {}) => {
     try {
+      if (!socket.user?.id) {
+        socket.emit("error_message", {
+          message: "Not authenticated for message event",
+        });
+        return;
+      }
       const saved = await createMessage({
         text: payload?.text ?? payload?.message,
         sender: payload?.sender,
-        userId: socket.user?.id || null,
+        userId: socket.user.id,
+        identityType: "user",
         source: "socket",
       });
       io.emit("message", saved);
     } catch (err) {
       socket.emit("error_message", {
         message: err?.message || "Failed to send message",
+      });
+    }
+  });
+
+  socket.on("ghost_message", async (payload = {}) => {
+    try {
+      const saved = await createMessage({
+        text: payload?.text ?? payload?.message,
+        sender: payload?.sender,
+        ghostId: payload?.ghostId,
+        identityType: "ghost",
+        source: "socket",
+      });
+      io.emit("ghost_message", saved);
+    } catch (err) {
+      socket.emit("error_message", {
+        message: err?.message || "Failed to send ghost message",
       });
     }
   });

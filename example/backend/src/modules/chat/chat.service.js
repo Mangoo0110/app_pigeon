@@ -1,6 +1,10 @@
+import crypto from "crypto";
 import User from "../user/user.model.js";
 import ChatMessage from "./chat.model.js";
+import Ghost from "./ghost.model.js";
 import AppError from "../../shared/errors/app_error.js";
+
+const GHOST_ID_REGEX = /^ghost_[a-z0-9_-]{4,64}$/;
 
 const toChatPayload = (doc) => {
   const createdAt = doc.createdAt ? new Date(doc.createdAt) : new Date();
@@ -15,18 +19,68 @@ const toChatPayload = (doc) => {
       profileImage: sender.profileImage || null,
     },
     userId: doc.userId?.toString?.() ?? null,
+    ghostId: doc.ghostId ?? null,
+    identityType: doc.identityType ?? "user",
     source: doc.source,
     sentAt: createdAt.toISOString(),
     createdAt: createdAt.toISOString(),
   };
 };
 
-const resolveSender = async ({ userId, sender }) => {
+const normalizeGhostId = (value) => String(value || "").trim().toLowerCase();
+
+const buildGhostName = (ghostId, fallbackName) => {
+  const name = String(fallbackName || "").trim();
+  if (name) return name;
+  const tail = ghostId.slice(-4);
+  return `Ghost ${tail}`;
+};
+
+const generateGhostId = () => `ghost_${crypto.randomBytes(8).toString("hex")}`;
+
+const findOrCreateGhostById = async (ghostId) => {
+  const normalized = normalizeGhostId(ghostId);
+  if (!normalized || !GHOST_ID_REGEX.test(normalized)) {
+    throw new AppError(
+      400,
+      "Invalid ghostId format. Expected something like ghost_ab12cd34"
+    );
+  }
+
+  const existing = await Ghost.findOneAndUpdate(
+    { ghostId: normalized },
+    { $set: { lastSeenAt: new Date() } },
+    { new: true }
+  );
+  if (existing) {
+    return { ghost: existing, exists: true };
+  }
+
+  const created = await Ghost.create({ ghostId: normalized, lastSeenAt: new Date() });
+  return { ghost: created, exists: false };
+};
+
+export const resolveGhostSession = async ({ ghostId }) => {
+  const normalized = normalizeGhostId(ghostId);
+  if (normalized) {
+    const { ghost, exists } = await findOrCreateGhostById(normalized);
+    return { ghostId: ghost.ghostId, exists };
+  }
+
+  let generated = generateGhostId();
+  while (await Ghost.exists({ ghostId: generated })) {
+    generated = generateGhostId();
+  }
+  await Ghost.create({ ghostId: generated, lastSeenAt: new Date() });
+  return { ghostId: generated, exists: false };
+};
+
+const resolveSender = async ({ userId, sender, identityType, ghostId }) => {
   const fallbackSender = sender && typeof sender === "object" ? sender : {};
-  if (!userId) {
+  if (identityType === "ghost") {
     return {
-      id: fallbackSender.id || "unknown",
-      name: fallbackSender.name || "Unknown",
+      id: ghostId || fallbackSender.id || "unknown",
+      name: buildGhostName(ghostId || "ghost_anon", fallbackSender.name),
       profileImage: fallbackSender.profileImage || null,
     };
   }
@@ -53,25 +107,50 @@ const resolveSender = async ({ userId, sender }) => {
   };
 };
 
-export const createMessage = async ({ text, sender, userId = null, source = "api" }) => {
+export const createMessage = async ({
+  text,
+  sender,
+  userId = null,
+  ghostId = null,
+  identityType = "user",
+  source = "api",
+}) => {
   const normalizedText = String(text || "").trim();
   if (!normalizedText) {
     throw new AppError(400, "Message text is required");
   }
 
-  const resolvedSender = await resolveSender({ userId, sender });
+  let resolvedGhostId = null;
+  if (identityType === "ghost") {
+    const ghostSession = await resolveGhostSession({ ghostId });
+    resolvedGhostId = ghostSession.ghostId;
+  } else if (!userId) {
+    throw new AppError(401, "Not authenticated");
+  }
+
+  const resolvedSender = await resolveSender({
+    userId,
+    sender,
+    identityType,
+    ghostId: resolvedGhostId,
+  });
   const created = await ChatMessage.create({
     text: normalizedText,
     sender: resolvedSender,
     userId: userId || null,
+    ghostId: resolvedGhostId,
+    identityType,
     source,
   });
   return toChatPayload(created.toObject());
 };
 
-export const listMessages = async ({ limit = 50, before }) => {
+export const listMessages = async ({ limit = 50, before, identityType = null }) => {
   const safeLimit = Math.max(1, Math.min(Number(limit) || 50, 200));
   const query = {};
+  if (identityType) {
+    query.identityType = identityType;
+  }
 
   if (before) {
     const beforeDate = new Date(before);
