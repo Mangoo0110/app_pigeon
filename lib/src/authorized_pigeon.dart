@@ -132,12 +132,14 @@ class AuthorizedPigeon
   Future<Response> get(
     String path, {
     dynamic data,
+    Options? options,
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
   }) {
     return _dio.get(path,
         queryParameters: queryParameters,
+        options: options,
         data: data,
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress);

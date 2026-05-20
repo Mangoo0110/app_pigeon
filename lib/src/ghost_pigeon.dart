@@ -72,6 +72,7 @@ class GhostPigeon with PigeonErrorHandler implements AppPigeon {
   Future<Response> get(
     String path, {
     dynamic data,
+    Options? options,
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
@@ -80,6 +81,7 @@ class GhostPigeon with PigeonErrorHandler implements AppPigeon {
       path,
       queryParameters: queryParameters,
       data: data,
+      options: options,
       cancelToken: cancelToken,
       onReceiveProgress: onReceiveProgress,
     );
