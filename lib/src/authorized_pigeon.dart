@@ -132,6 +132,7 @@ class AuthorizedPigeon
   Future<Response> get(
     String path, {
     dynamic data,
+    Options? options,
     Map<String, dynamic>? queryParameters,
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
