@@ -139,6 +139,7 @@ class AuthorizedPigeon
   }) {
     return _dio.get(path,
         queryParameters: queryParameters,
+        options: options,
         data: data,
         cancelToken: cancelToken,
         onReceiveProgress: onReceiveProgress);
