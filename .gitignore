@@ -32,4 +32,4 @@ migrate_working_dir/
 
 # backend
 **/node_modules
-**/.env
+config.bat

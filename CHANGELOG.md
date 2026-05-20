@@ -1,3 +1,7 @@
+## 0.1.5
+- Added request `Options` forwarding for GET requests in `AuthorizedPigeon` and `GhostPigeon`.
+
+
 ## 0.1.4
 - Refactored core client architecture with a shared `AppPigeon` contract and separated runtime clients for authorized and ghost flows.
 - Renamed authorized client surface to `AuthorizedPigeon` and introduced `Authorization` abstraction for token persistence operations.
