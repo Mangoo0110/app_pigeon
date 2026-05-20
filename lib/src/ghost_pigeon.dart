@@ -81,6 +81,7 @@ class GhostPigeon with PigeonErrorHandler implements AppPigeon {
       path,
       queryParameters: queryParameters,
       data: data,
+      options: options,
       cancelToken: cancelToken,
       onReceiveProgress: onReceiveProgress,
     );
