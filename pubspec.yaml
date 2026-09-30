@@ -1,0 +1,28 @@
+name: app_pigeon
+description: "A simple auth-aware networking layer for Flutter apps. Built on top of Dio, socket_io_client and flutter_secure_storage."
+version: 0.1.5
+homepage: https://github.com/Mangoo0110/app_pigeon
+repository: https://github.com/Mangoo0110/app_pigeon
+
+environment:
+  sdk: ^3.0.0
+  flutter: ">=1.17.0"
+
+dependencies:
+  dio: ^5.9.0
+  flutter:
+    sdk: flutter
+  flutter_secure_storage: ^9.2.4
+  socket_io_client: ^3.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+
+  # To add assets to your package, add an assets section, like this:
+  # assets:
+  #   - images/a_dot_burr.jpeg
+  #   - images/a_dot_ham.jpeg
