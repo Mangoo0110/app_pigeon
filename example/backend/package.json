@@ -6,8 +6,8 @@
   "main": "src/server.js",
   "type": "module",
   "scripts": {
-    "start": "node api.js && node src/server.js",
-    "dev": "node api.js && nodemon -L src/server.js",
+    "start": "node init && node src/server.js",
+    "dev": "node init && nodemon -L src/server.js",
     "staging": "env-cmd -f .env.staging node src/server.js",
     "prod": "env-cmd -f .env.production node src/server.js",
     "beta": "env-cmd -f .env.beta node src/server.js"
